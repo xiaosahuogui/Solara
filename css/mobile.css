@@ -1,7 +1,8 @@
 /*
  * Mobile-specific layout (v2 Optimized & Refactored)
- * Theme: Dark Glass
+ * Theme: Dark Glass (Unified)
  * Date: 2025-10-24
+ * Fix: v2.1 (Corrected aspect ratio for album cover)
  */
 
 /* === 1. Global Setup & Body === */
@@ -110,7 +111,6 @@ body.mobile-view .container {
 }
 
 body.mobile-view .container::after {
-    /* Original decorative gradients removed for a cleaner look */
     display: none;
 }
 
@@ -181,7 +181,8 @@ body.mobile-view .mobile-turntable {
     justify-content: center;
     align-items: center;
     width: min(72vw, 300px);
-    height: min(72vw, 300px);
+    /* UPDATED: height set to auto to respect aspect-ratio */
+    height: auto;
     margin: 0 auto;
     aspect-ratio: 1/1;
     flex: none;
@@ -228,7 +229,8 @@ body.mobile-view .album-cover {
     top: 50%;
     left: 50%;
     width: 56%;
-    height: 56%;
+    /* UPDATED: height set to auto to respect aspect-ratio */
+    height: auto;
     transform: translate(-50%, -50%);
     border-radius: 50%;
     overflow: hidden;
@@ -285,9 +287,10 @@ body.mobile-view .mobile-inline-lyrics {
     left: 50%;
     transform: translate(-50%, -50%);
     width: min(78vw, 320px);
-    height: min(78vw, 320px);
+    /* UPDATED: height set to auto to respect aspect-ratio */
+    height: auto;
     border-radius: 26px;
-    background: rgba(102, 126, 234, 0.9);
+    background: rgba(35, 37, 45, 0.9);
     backdrop-filter: blur(25px);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -651,7 +654,9 @@ body.mobile-view .mobile-panel {
     transform: translate(-50%, 110%);
     bottom: 0;
     width: min(100%, 420px);
-    background: rgba(102, 126, 234, 0.95);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%),
+        linear-gradient(180deg, rgba(45, 47, 55, 0.9), rgba(35, 37, 45, 0.95));
     backdrop-filter: blur(30px);
     border-radius: 28px 28px 0 0;
     padding: 16px clamp(16px, 5vw, 24px) calc(env(safe-area-inset-bottom) + clamp(20px, 6vw, 28px));
@@ -667,7 +672,7 @@ body.mobile-view .mobile-panel {
     overflow: hidden;
     overscroll-behavior: contain;
     touch-action: pan-y;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 body.mobile-view.mobile-panel-open .mobile-panel {
@@ -858,7 +863,10 @@ body.mobile-view .search-area {
     inset: 0;
     width: 100%;
     height: 100%;
-    background: rgba(102, 126, 234, 0.98);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        linear-gradient(180deg, rgba(35, 37, 45, 0.95), rgba(25, 27, 35, 0.98));
+    backdrop-filter: blur(24px);
     transform: translateY(-100%);
     transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
     z-index: 160;
@@ -871,7 +879,6 @@ body.mobile-view .search-area {
     justify-content: flex-start;
     opacity: 0;
     pointer-events: none;
-    backdrop-filter: none;
 }
 
 body.mobile-view.mobile-search-open .search-area {
@@ -1055,7 +1062,6 @@ body.mobile-view .search-result-info {
     min-width: 0; /* Critical for flex truncation */
     flex: 1;      /* Allows it to take all available space */
     overflow: hidden;
-    /* max-width: 280px; <-- Removed to allow full width */
 }
 
 /* Song Title (Optimized for width) */
