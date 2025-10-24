@@ -932,12 +932,17 @@ body.mobile-view .search-area {
     justify-content: flex-start;
     opacity: 0;
     pointer-events: none;
+    backdrop-filter: none !important;
 }
 
 body.mobile-view.mobile-search-open .search-area {
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
+}
+
+body.mobile-view.mobile-search-open {
+    backdrop-filter: none !important;
 }
 
 body.mobile-view .search-area .mobile-close-btn {
