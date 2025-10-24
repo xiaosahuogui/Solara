@@ -918,13 +918,13 @@ body.mobile-view .search-area .mobile-close-btn {
 
 body.mobile-view .search-area .search-container,
 body.mobile-view .search-area .search-results {
-    width: 100%;
+    width: min(100%, 340px);
     box-sizing: border-box;
     align-self: center;
 }
 
 body.mobile-view .search-results-toolbar {
-    width: 100%;
+    width: min(100%, 340px);
     margin: 0 auto;
     padding-top: 8px;
     display: flex;
@@ -977,8 +977,28 @@ body.mobile-view .play-all-btn i {
 }
 
 body.mobile-view .search-results-list {
-    width: 100%;
+    width: min(100%, 340px);
     margin: 0 auto;
+}
+
+body.mobile-view .search-area > :not(.mobile-close-btn) {
+    width: min(100%, 360px);
+    align-self: center;
+}
+
+body.mobile-view .search-area > :not(.mobile-close-btn) {
+    width: min(100%, 340px);
+    align-self: center;
+}
+
+body.mobile-view .search-area > :not(.mobile-close-btn) {
+    width: min(100%, 340px);
+    align-self: center;
+}
+
+body.mobile-view .search-area > :not(.mobile-close-btn) {
+    width: min(100%, 340px);
+    align-self: center;
 }
 
 body.mobile-view .search-container {
@@ -1026,7 +1046,7 @@ body.mobile-view .search-results {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    width: 100%;
+    width: min(100%, 340px);
     margin: 0 auto;
 }
 
@@ -1047,6 +1067,110 @@ body.mobile-view #notification.show {
 body.mobile-view .debug-info {
     display: none;
 }
+
+/* === 修正与优化补丁 START === */
+
+/* 修复专辑封面比例为正圆 */
+body.mobile-view .mobile-turntable,
+body.mobile-view .mobile-turntable__platter,
+body.mobile-view .album-cover,
+body.mobile-view .album-cover img {
+    width: min(72vw, 300px) !important;
+    height: min(72vw, 300px) !important;
+    aspect-ratio: 1 / 1 !important;
+}
+
+/* 去除厚重的圆角黑色容器背景 */
+body.mobile-view .container {
+    background: rgba(20, 20, 25, 0.25) !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(20px) !important;
+    padding: clamp(16px, 5vw, 28px);
+}
+
+body.mobile-view .container::after {
+    display: none !important;
+}
+
+/* 调整其他按钮背景透明度，统一玻璃风格 */
+body.mobile-view .transport-button,
+body.mobile-view .mobile-toolbar__button,
+body.mobile-view .mobile-panel-action-btn,
+body.mobile-view .mobile-close-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* 高亮播放按钮 */
+body.mobile-view .transport-button--play {
+    background: linear-gradient(135deg, #f36d6d 0%, #f3a25b 100%) !important;
+    color: #1f1b1d !important;
+}
+
+/* 当前播放歌曲自动对齐时的视觉提示 */
+body.mobile-view .playlist-items .playlist-item.current {
+    background: rgba(243, 162, 91, 0.25) !important;
+    color: #ffffff !important;
+    scroll-margin: 60px !important;
+}
+
+/* 让播放列表滚动区更顺滑 */
+body.mobile-view .playlist-scroll {
+    scroll-behavior: smooth;
+}
+
+/* === 修正与优化补丁 END === */
+
+/* === 专辑封面彻底正圆修复 START === */
+body.mobile-view .cover-area {
+    display: grid !important;
+    place-items: center !important;
+    align-content: center !important;
+}
+
+body.mobile-view .mobile-turntable {
+    display: grid !important;
+    place-items: center !important;
+    flex: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: min(72vw, 300px) !important;
+    height: min(72vw, 300px) !important;
+    aspect-ratio: 1 / 1 !important;
+}
+
+body.mobile-view .mobile-turntable__platter {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    flex: none !important;
+}
+
+body.mobile-view .album-cover {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 56% !important;
+    height: 56% !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
+}
+
+body.mobile-view .album-cover img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+/* === 专辑封面彻底正圆修复 END === */
 
 /* === v3 视觉优化与功能增强补丁 START === */
 
@@ -1138,24 +1262,40 @@ body.mobile-view .container {
     border-radius: 24px !important;
 }
 
-/* ----------- 4. 播放列表视觉增强：吸附 + 居中 + 高亮 ----------- */
+/* ----------- 4. 播放列表视觉增强：居中 + 高亮 + 自动滚动 ----------- */
 body.mobile-view .playlist-scroll {
-    scroll-snap-type: y mandatory !important;
     scroll-behavior: smooth !important;
     overflow-y: auto !important;
+    position: relative !important;
 }
 
 body.mobile-view .playlist-item {
-    scroll-snap-align: center !important;
     transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease !important;
+    scroll-margin: 60px !important; /* 确保滚动时元素可见 */
 }
 
 body.mobile-view .playlist-item.current {
     background: rgba(243, 162, 91, 0.3) !important;
     color: #fff !important;
-    transform: scale(1.05) !important;
-    box-shadow: 0 0 30px rgba(243, 162, 91, 0.35) !important;
+    transform: scale(1.02) !important;
+    box-shadow: 0 0 20px rgba(243, 162, 91, 0.35) !important;
     border: 1px solid rgba(243, 162, 91, 0.45) !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* 确保播放列表容器正确显示 */
+body.mobile-view .playlist.active {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+body.mobile-view .playlist-scroll {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
 /* ----------- 5. 调整控制按钮更协调 ----------- */
