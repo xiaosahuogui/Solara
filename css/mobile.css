@@ -147,6 +147,8 @@ body.mobile-view .mobile-toolbar__button {
     justify-content: center;
     backdrop-filter: blur(8px);
     transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    aspect-ratio: 1/1;
+    flex-shrink: 0;
 }
 
 body.mobile-view .mobile-toolbar__button:active,
@@ -175,6 +177,10 @@ body.mobile-view .cover-area {
     text-align: center;
     gap: clamp(16px, 4vw, 24px);
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
 }
 
 body.mobile-view .mobile-turntable {
@@ -182,11 +188,17 @@ body.mobile-view .mobile-turntable {
     position: relative;
     display: flex;
     justify-content: center;
+    align-items: center;
+    width: 100%;
+    aspect-ratio: 1/1;
+    max-width: min(78vw, 320px);
+    max-height: min(78vw, 320px);
+    margin: 0 auto;
 }
 
 body.mobile-view .mobile-turntable__platter {
-    width: min(78vw, 320px);
-    height: min(78vw, 320px);
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     background: radial-gradient(circle at 48% 50%, #1a1d25 0%, #05070c 65%, #000 100%);
     box-shadow: 0 32px 70px rgba(0, 0, 0, 0.55);
@@ -197,6 +209,7 @@ body.mobile-view .mobile-turntable__platter {
     overflow: hidden;
     animation: mobile-turntable-spin 18s linear infinite;
     animation-play-state: paused;
+    aspect-ratio: 1/1;
 }
 
 body.mobile-view .mobile-turntable__platter::before {
@@ -244,6 +257,7 @@ body.mobile-view .album-cover {
         0 18px 38px rgba(0, 0, 0, 0.45);
     background: rgba(0, 0, 0, 0.35);
     z-index: 2;
+    aspect-ratio: 1/1;
 }
 
 body.mobile-view .album-cover img {
@@ -251,6 +265,7 @@ body.mobile-view .album-cover img {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
+    aspect-ratio: 1/1;
 }
 
 body.mobile-view .album-cover .placeholder {
@@ -274,6 +289,8 @@ body.mobile-view .mobile-inline-lyrics {
     gap: 12px;
     overflow: hidden;
     cursor: pointer;
+    aspect-ratio: 1/1;
+    margin: 0 auto;
 }
 
 body.mobile-view .mobile-inline-lyrics__hint {
@@ -483,6 +500,7 @@ body.mobile-view .transport-controls {
     justify-content: space-between;
     align-items: center;
     gap: clamp(12px, 5vw, 18px);
+    padding: 0 clamp(8px, 3vw, 16px);
 }
 
 body.mobile-view .transport-button {
@@ -494,6 +512,8 @@ body.mobile-view .transport-button {
     color: #ffffff;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
     transition: transform 0.25s ease, background 0.25s ease;
+    aspect-ratio: 1/1;
+    flex-shrink: 0;
 }
 
 body.mobile-view .play-mode-btn {
@@ -513,6 +533,8 @@ body.mobile-view .transport-button--play {
     background: linear-gradient(135deg, #f36d6d 0%, #f3a25b 100%);
     color: #1f1b1d;
     box-shadow: 0 18px 36px rgba(243, 117, 109, 0.45);
+    aspect-ratio: 1/1;
+    flex-shrink: 0;
 }
 
 body.mobile-view .transport-button:active {
@@ -642,6 +664,8 @@ body.mobile-view .mobile-close-btn {
     color: #ffffff;
     cursor: pointer;
     transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    aspect-ratio: 1/1;
+    flex-shrink: 0;
 }
 
 body.mobile-view .mobile-panel-action-btn i,
