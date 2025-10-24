@@ -2986,25 +2986,13 @@ function updateCurrentSongInfo(song, options = {}) {
 }
 
 // 搜索功能 - 修复搜索下拉框显示问题
+// 搜索功能 - 修复搜索下拉框显示问题
 async function performSearch(isLiveSearch = false) {
-    console.log('搜索功能被调用');
-    
-    if (!dom.searchInput) {
-        console.error('搜索输入框未找到');
-        return;
-    }
-    
     const query = dom.searchInput.value.trim();
     if (!query) {
         showNotification("请输入搜索关键词", "error");
         return;
     }
-
-    console.log(`搜索关键词: ${query}`);
-
-    // 其他搜索代码保持不变，但添加更多调试信息...
-}
-
 
     if (state.sourceMenuOpen) {
         closeSourceMenu();
@@ -3079,6 +3067,7 @@ async function performSearch(isLiveSearch = false) {
         dom.searchBtn.innerHTML = '<i class="fas fa-search"></i><span>搜索</span>';
     }
 }
+
 
 // 加载更多搜索结果
 async function loadMoreResults() {
