@@ -2496,13 +2496,22 @@ function setupInteractions() {
 			playPlaylistSong(index);
 		};
 		const handlePlaylistAction = (event, actionButton) => {
-				const index = Number(actionButton.dataset.index);
-				if (Number.isNaN(index)) {
-					return;
+			const index = Number(actionButton.dataset.index);
+			if (Number.isNaN(index)) {
+				return;
+			}
+			
+			const action = actionButton.dataset.playlistAction;
+			if (action === "remove") {
+				removeFromPlaylist(index);
+			} else if (action === "download") {
+				showQualityMenu(event, index, "playlist");
+			}
+		};
 
-					try {
-						// 绑定事件监听器
-						dom.playPauseBtn.addEventListener("click", togglePlayPause);
+		try {
+			// 绑定事件监听器
+			dom.playPauseBtn.addEventListener("click", togglePlayPause);
 						dom.audioPlayer.addEventListener("timeupdate", handleTimeUpdate);
 						dom.audioPlayer.addEventListener("loadedmetadata", handleLoadedMetadata);
 						dom.audioPlayer.addEventListener("play", updatePlayPauseButton);
@@ -4776,13 +4785,13 @@ function setupInteractions() {
 					}
 
 					// 修改通知函数以支持持续时间参数
-				function showNotification(message, type = "success", duration = 3000) {
-				    const notification = dom.notification;
-				    notification.textContent = message;
-				    notification.className = `notification ${type}`;
-				    notification.classList.add("show");
-				
-				    setTimeout(() => {
-				        notification.classList.remove("show");
-				    }, duration);
-                }}}}}
+function showNotification(message, type = "success", duration = 3000) {
+				const notification = dom.notification;
+				notification.textContent = message;
+				notification.className = `notification ${type}`;
+				notification.classList.add("show");
+
+				setTimeout(() => {
+				    notification.classList.remove("show");
+				}, duration);
+}
