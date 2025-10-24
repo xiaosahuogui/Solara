@@ -569,7 +569,7 @@ const API = {
         }
     },
 
-    search: async (keyword, source = "netease", count = 20, page = 1) => {
+    search: async (keyword, source = "kuwo", count = 50, page = 1) => {
         const signature = API.generateSignature();
         const url = `${API.baseUrl}?types=search&source=${source}&name=${encodeURIComponent(keyword)}&count=${count}&pages=${page}&s=${signature}`;
 
