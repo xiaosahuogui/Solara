@@ -177,6 +177,7 @@ function openMobilePanel(view = "playlist") {
     const result = invokeMobileHook("openPanel", view);
     // 如果是播放列表视图，添加自动滚动
     if (view === "playlist") {
+        debugLog("移动端打开播放列表面板，准备自动滚动");
         setTimeout(() => {
             scrollToCurrentPlaylistItem();
         }, 300);
@@ -1466,6 +1467,13 @@ document.addEventListener("keydown", (e) => {
             dom.debugInfo.classList.remove("show");
         }
     }
+    
+    // 测试播放列表滚动（按Ctrl+S）
+    if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        debugLog("手动触发播放列表滚动测试");
+        window.testPlaylistScroll();
+    }
 });
 
 // 新增：切换搜索模式
@@ -2357,7 +2365,7 @@ function setupInteractions() {
                 }, 300);
             } else {
                 switchMobileView("playlist");
-                // 桌面端立即滚动
+                // 桌面端立即滚动，确保播放列表视图已激活
                 setTimeout(() => {
                     scrollToCurrentPlaylistItem();
                 }, 100);
@@ -3572,6 +3580,7 @@ function renderPlaylist() {
     
     // 如果当前有正在播放的歌曲，自动滚动到该歌曲
     if (state.currentPlaylist === "playlist" && state.currentTrackIndex >= 0) {
+        debugLog("渲染播放列表: 检测到当前播放歌曲，准备自动滚动");
         setTimeout(() => {
             scrollToCurrentPlaylistItem();
         }, 100);
@@ -3698,6 +3707,10 @@ async function playPlaylistSong(index) {
     try {
         await playSong(song);
         updatePlaylistHighlight();
+        // 播放后自动滚动到当前歌曲
+        setTimeout(() => {
+            scrollToCurrentPlaylistItem();
+        }, 200);
         if (isMobileView) {
             closeMobilePanel();
         }
@@ -3710,11 +3723,26 @@ async function playPlaylistSong(index) {
 // 新增：滚动到当前播放的播放列表项目
 function scrollToCurrentPlaylistItem() {
     if (!dom.playlistItems || state.currentPlaylist !== "playlist" || state.currentTrackIndex < 0) {
+        debugLog(`播放列表滚动条件不满足: playlistItems=${!!dom.playlistItems}, currentPlaylist=${state.currentPlaylist}, currentTrackIndex=${state.currentTrackIndex}`);
         return;
+    }
+    
+    // 确保播放列表容器可见
+    if (dom.playlist && dom.playlist.classList.contains("active")) {
+        debugLog("播放列表已激活，可以滚动");
     }
     
     const currentItem = dom.playlistItems.querySelector(`.playlist-item[data-index="${state.currentTrackIndex}"]`);
     if (!currentItem) {
+        debugLog(`播放列表滚动: 找不到当前歌曲元素, index=${state.currentTrackIndex}`);
+        // 尝试重新渲染播放列表后再次滚动
+        setTimeout(() => {
+            const retryItem = dom.playlistItems.querySelector(`.playlist-item[data-index="${state.currentTrackIndex}"]`);
+            if (retryItem) {
+                debugLog("重试滚动成功");
+                scrollToCurrentPlaylistItem();
+            }
+        }, 100);
         return;
     }
     
@@ -3742,9 +3770,16 @@ function scrollToCurrentPlaylistItem() {
         } else {
             container.scrollTop = finalScrollTop;
         }
+        debugLog(`播放列表滚动: 当前歌曲索引=${state.currentTrackIndex}, 目标滚动位置=${finalScrollTop}, 容器高度=${containerHeight}`);
+    } else {
+        debugLog(`播放列表滚动: 无需滚动, 当前位置=${container.scrollTop}, 目标位置=${finalScrollTop}`);
     }
-    
-    debugLog(`播放列表滚动: 当前歌曲索引=${state.currentTrackIndex}, 目标滚动位置=${finalScrollTop}`);
+}
+
+// 新增：强制滚动到当前播放列表项目（用于调试和测试）
+function forceScrollToCurrentPlaylistItem() {
+    debugLog("强制滚动到当前播放列表项目");
+    scrollToCurrentPlaylistItem();
 }
 
 // 新增：更新播放列表高亮
@@ -4469,3 +4504,44 @@ function showNotification(message, type = "success") {
         notification.classList.remove("show");
     }, 3000);
 }
+
+// 新增：全局函数用于测试播放列表滚动
+window.testPlaylistScroll = function() {
+    debugLog("测试播放列表滚动功能");
+    if (state.currentPlaylist === "playlist" && state.currentTrackIndex >= 0) {
+        debugLog(`当前播放列表: ${state.currentPlaylist}, 当前歌曲索引: ${state.currentTrackIndex}`);
+        scrollToCurrentPlaylistItem();
+        showNotification("正在滚动到当前播放歌曲", "success");
+    } else {
+        debugLog("没有正在播放的歌曲或不在播放列表模式");
+        showNotification("没有正在播放的歌曲或不在播放列表模式", "error");
+    }
+};
+
+// 新增：确保播放列表显示时自动滚动到当前歌曲
+window.ensurePlaylistScroll = function() {
+    if (dom.playlist && dom.playlist.classList.contains("active")) {
+        debugLog("播放列表已激活，触发自动滚动");
+        setTimeout(() => {
+            scrollToCurrentPlaylistItem();
+        }, 150);
+    }
+};
+
+// 在切换视图时确保滚动
+const originalSwitchMobileView = window.switchMobileView;
+window.switchMobileView = function(view) {
+    originalSwitchMobileView(view);
+    if (view === "playlist") {
+        debugLog("切换到播放列表视图，准备自动滚动");
+        setTimeout(() => {
+            scrollToCurrentPlaylistItem();
+        }, 150);
+    }
+};
+
+// 新增：强制滚动到当前播放列表项目（用于调试）
+window.forceScrollToCurrentPlaylistItem = function() {
+    debugLog("强制滚动到当前播放列表项目");
+    scrollToCurrentPlaylistItem();
+};
