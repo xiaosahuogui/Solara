@@ -809,11 +809,53 @@ body.mobile-view .search-results-toolbar {
     width: min(100%, 340px);
     margin: 0 auto;
     padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 body.mobile-view .import-selected-btn {
     width: 100%;
     justify-content: center;
+}
+
+/* 播放全部按钮样式 */
+body.mobile-view .play-all-btn {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(243, 162, 91, 0.4);
+    background: linear-gradient(135deg, rgba(243, 109, 109, 0.15), rgba(243, 162, 91, 0.15));
+    color: #f3a25b;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(243, 162, 91, 0.2);
+    margin-bottom: 12px;
+}
+
+body.mobile-view .play-all-btn:hover,
+body.mobile-view .play-all-btn:focus-visible {
+    background: linear-gradient(135deg, rgba(243, 109, 109, 0.25), rgba(243, 162, 91, 0.25));
+    border-color: rgba(243, 162, 91, 0.6);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(243, 162, 91, 0.35);
+}
+
+body.mobile-view .play-all-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 20px rgba(243, 162, 91, 0.25);
+}
+
+body.mobile-view .play-all-btn i {
+    font-size: 1.1rem;
 }
 
 body.mobile-view .search-results-list {
