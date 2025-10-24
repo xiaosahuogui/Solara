@@ -4773,3 +4773,4 @@ function setupInteractions() {
 				        notification.classList.remove("show");
 				    }, duration);
 				}
+				}
