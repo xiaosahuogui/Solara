@@ -2850,20 +2850,31 @@ const restoredSong = state.playlistSongs[restoredIndex];
             console.error("恢复歌曲信息失败:", error);
         });
         
-        // 新增：页面加载时自动定位到当前歌曲
-        autoScrollToCurrentSong();
-    }
-    
-    savePlayerState();
-    } else {
-        dom.playlist.classList.add("empty");
-        if (dom.playlistItems) {
-            dom.playlistItems.innerHTML = "";
-        }
-        updateMobileClearPlaylistVisibility();
-    }
+            updatePlaylistActionStates();
 
-    
+    // 播放列表恢复逻辑
+    if (state.playlistSongs.length > 0) {
+        let restoredIndex = state.currentTrackIndex;
+        if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
+            restoredIndex = 0;
+        }
+
+        state.currentTrackIndex = restoredIndex;
+        state.currentPlaylist = "playlist";
+        renderPlaylist();
+
+        const restoredSong = state.playlistSongs[restoredIndex];
+        if (restoredSong) {
+            state.currentSong = restoredSong;
+            updatePlaylistHighlight();
+            updateCurrentSongInfo(restoredSong).catch(error => {
+                console.error("恢复歌曲信息失败:", error);
+            });
+            
+            // 新增：页面加载时自动定位到当前歌曲
+            autoScrollToCurrentSong();
+        }
+
         savePlayerState();
     } else {
         dom.playlist.classList.add("empty");
@@ -2881,7 +2892,23 @@ const restoredSong = state.playlistSongs[restoredIndex];
         initializeMobileUI();
         updateMobileClearPlaylistVisibility();
     }
-}
+
+    console.log('Solara播放器初始化完成');
+
+    // 测试按钮功能
+    setTimeout(() => {
+        console.log('=== 功能测试 ===');
+        console.log('探索雷达按钮:', dom.loadOnlineBtn ? '存在' : '不存在');
+        console.log('播放/暂停按钮:', dom.playPauseBtn ? '存在' : '不存在');
+        console.log('搜索按钮:', dom.searchBtn ? '存在' : '不存在');
+        console.log('音质切换按钮:', dom.qualityToggle ? '存在' : '不存在');
+        
+        // 测试关键函数
+        console.log('探索雷达函数:', typeof exploreOnlineMusic);
+        console.log('播放/暂停函数:', typeof togglePlayPause);
+        console.log('搜索函数:', typeof performSearch);
+    }, 1000);
+} // setupInteractions 函数结束
 
 // 修复：更新当前歌曲信息和封面
 function updateCurrentSongInfo(song, options = {}) {
