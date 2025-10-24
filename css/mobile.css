@@ -549,7 +549,7 @@ body.mobile-view .transport-controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: clamp(12px, 5vw, 18px);
+    gap: clamp(8px, 4vw, 14px);
     padding: 0 clamp(8px, 3vw, 16px);
 }
 
@@ -918,13 +918,13 @@ body.mobile-view .search-area .mobile-close-btn {
 
 body.mobile-view .search-area .search-container,
 body.mobile-view .search-area .search-results {
-    width: min(100%, 340px);
+    width: min(100%, 380px);
     box-sizing: border-box;
     align-self: center;
 }
 
 body.mobile-view .search-results-toolbar {
-    width: min(100%, 340px);
+    width: min(100%, 380px);
     margin: 0 auto;
     padding-top: 8px;
     display: flex;
@@ -977,7 +977,7 @@ body.mobile-view .play-all-btn i {
 }
 
 body.mobile-view .search-results-list {
-    width: min(100%, 340px);
+    width: min(100%, 380px);
     margin: 0 auto;
 }
 
@@ -1046,7 +1046,7 @@ body.mobile-view .search-results {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    width: min(100%, 340px);
+    width: min(100%, 380px);
     margin: 0 auto;
 }
 
@@ -1359,7 +1359,7 @@ body.mobile-view .search-results,
 body.mobile-view .search-results-list,
 body.mobile-view .search-results-toolbar {
     width: min(100%, 420px) !important;
-    max-width: 92vw !important; /* 比屏幕略窄 */
+    max-width: 96vw !important; /* 增加宽度，减少屏幕边界遮挡 */
 }
 
 /* 5. 搜索结果文本处理 */
@@ -1374,6 +1374,7 @@ body.mobile-view .search-result-artist {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 280px; /* 增加歌名显示宽度 */
 }
 
 /* 6. 播放列表高亮与自动滚动功能保留 */
@@ -1406,6 +1407,41 @@ body.mobile-view .transport-button--play {
     background: linear-gradient(135deg, #f36d6d, #f3a25b) !important;
     box-shadow: 0 12px 30px rgba(243, 117, 109, 0.45) !important;
     color: #1a1b1f !important;
+}
+
+/* === Search Results Display Optimization === */
+body.mobile-view .search-result-item {
+    padding: 14px 16px !important;
+    min-height: 60px !important;
+}
+
+body.mobile-view .search-result-info {
+    min-width: 0 !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+    max-width: 300px !important; /* 增加信息显示区域宽度 */
+}
+
+body.mobile-view .search-result-title {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 280px !important; /* 确保歌名有足够显示空间 */
+    line-height: 1.3 !important;
+}
+
+body.mobile-view .search-result-artist {
+    font-size: 0.85rem !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 280px !important; /* 增加艺术家显示宽度 */
+    line-height: 1.3 !important;
+    margin-top: 2px !important;
 }
 
 /* === END of Custom Mobile Optimization === */
