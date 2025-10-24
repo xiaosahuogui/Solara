@@ -1123,3 +1123,51 @@ body.mobile-view .playlist-scroll {
 }
 
 /* === 修正与优化补丁 END === */
+
+/* === 专辑封面彻底正圆修复 START === */
+body.mobile-view .cover-area {
+    display: grid !important;
+    place-items: center !important;
+    align-content: center !important;
+}
+
+body.mobile-view .mobile-turntable {
+    display: grid !important;
+    place-items: center !important;
+    flex: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: min(72vw, 300px) !important;
+    height: min(72vw, 300px) !important;
+    aspect-ratio: 1 / 1 !important;
+}
+
+body.mobile-view .mobile-turntable__platter {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    flex: none !important;
+}
+
+body.mobile-view .album-cover {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 56% !important;
+    height: 56% !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
+}
+
+body.mobile-view .album-cover img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+/* === 专辑封面彻底正圆修复 END === */
