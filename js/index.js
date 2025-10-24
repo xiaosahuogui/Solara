@@ -2502,6 +2502,9 @@ function setupInteractions() {
     updatePlaylistActionStates();
 
     // 播放列表恢复逻辑
+     updatePlaylistActionStates();
+
+    // 播放列表恢复逻辑
     if (state.playlistSongs.length > 0) {
         let restoredIndex = state.currentTrackIndex;
         if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
@@ -2557,7 +2560,8 @@ function setupInteractions() {
         console.log('播放/暂停函数:', typeof togglePlayPause);
         console.log('搜索函数:', typeof performSearch);
     }, 1000);
-}
+} // setupInteractions 函数结束
+
 
 
     function applyTheme(isDark) {
@@ -2827,18 +2831,18 @@ function setupInteractions() {
 
     updatePlaylistActionStates();
 
-    // 在 setupInteractions 函数末尾的播放列表恢复逻辑
-if (state.playlistSongs.length > 0) {
-    let restoredIndex = state.currentTrackIndex;
-    if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
-        restoredIndex = 0;
-    }
+        // 在 setupInteractions 函数末尾的播放列表恢复逻辑
+    if (state.playlistSongs.length > 0) {
+        let restoredIndex = state.currentTrackIndex;
+        if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
+            restoredIndex = 0;
+        }
 
-    state.currentTrackIndex = restoredIndex;
-    state.currentPlaylist = "playlist";
-    renderPlaylist();
+        state.currentTrackIndex = restoredIndex;
+        state.currentPlaylist = "playlist";
+        renderPlaylist();
 
-    const restoredSong = state.playlistSongs[restoredIndex];
+const restoredSong = state.playlistSongs[restoredIndex];
     if (restoredSong) {
         state.currentSong = restoredSong;
         updatePlaylistHighlight();
@@ -2849,15 +2853,16 @@ if (state.playlistSongs.length > 0) {
         // 新增：页面加载时自动定位到当前歌曲
         autoScrollToCurrentSong();
     }
-
+    
     savePlayerState();
-} else {
-    dom.playlist.classList.add("empty");
-    if (dom.playlistItems) {
-        dom.playlistItems.innerHTML = "";
+    } else {
+        dom.playlist.classList.add("empty");
+        if (dom.playlistItems) {
+            dom.playlistItems.innerHTML = "";
+        }
+        updateMobileClearPlaylistVisibility();
     }
-    updateMobileClearPlaylistVisibility();
-}
+
     
         savePlayerState();
     } else {
