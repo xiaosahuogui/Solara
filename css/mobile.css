@@ -8,16 +8,16 @@ body.mobile-view * {
 html.mobile-view,
 body.mobile-view {
     background:
-        linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%),
-        radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.05) 0%, transparent 50%);
-    color: #334155;
+        linear-gradient(135deg, #667eea 0%, #764ba2 100%),
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    color: #ffffff;
     height: var(--mobile-vh, 100dvh);
     min-height: var(--mobile-vh, 100dvh);
     overflow: hidden;
     touch-action: pan-y;
     overscroll-behavior: none;
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(20px);
 }
 
 body.mobile-view {
@@ -46,9 +46,9 @@ body.mobile-view .background-stage {
     html.mobile-view,
     body.mobile-view {
         background:
-            linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%),
-            radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.05) 0%, transparent 50%);
+            linear-gradient(135deg, #667eea 0%, #764ba2 100%),
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
     }
 
     body.mobile-view {
@@ -89,18 +89,17 @@ body.mobile-view .background-stage {
 body.mobile-view .container {
     width: 100%;
     max-width: 420px;
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.92) 100%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95));
-    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(25px);
+    border-radius: 28px;
     padding: clamp(16px, 5vw, 28px);
     padding-top: calc(env(safe-area-inset-top) + clamp(18px, 6vw, 32px));
     padding-bottom: calc(env(safe-area-inset-bottom) + clamp(22px, 7vw, 32px));
     box-shadow:
-        0 16px 40px rgba(0, 0, 0, 0.12),
-        0 4px 16px rgba(0, 0, 0, 0.08),
-        0 0 0 1px rgba(255, 255, 255, 0.8),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        0 20px 50px rgba(0, 0, 0, 0.25),
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
     display: flex;
     flex-direction: column;
     gap: clamp(12px, 4vw, 24px);
@@ -109,8 +108,7 @@ body.mobile-view .container {
     flex: 1 1 auto;
     min-height: calc(var(--mobile-vh, 100dvh) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     box-sizing: border-box;
-    backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 body.mobile-view .container::after {
@@ -143,9 +141,10 @@ body.mobile-view .mobile-toolbar {
 body.mobile-view .mobile-toolbar__title {
     font-size: 1.05rem;
     font-weight: 600;
-    color: #1e293b;
+    color: #ffffff;
     letter-spacing: 0.04em;
     text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 body.mobile-view .mobile-toolbar__actions {
@@ -158,24 +157,27 @@ body.mobile-view .mobile-toolbar__button {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.04);
-    color: #475569;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(8px);
-    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
     aspect-ratio: 1/1;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 body.mobile-view .mobile-toolbar__button:active,
 body.mobile-view .mobile-toolbar__button:focus-visible,
 body.mobile-view .mobile-toolbar__button:hover {
-    background: rgba(243, 162, 91, 0.15);
-    color: #1e293b;
-    border-color: rgba(243, 162, 91, 0.4);
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 body.mobile-view .main-content {
@@ -331,25 +333,27 @@ body.mobile-view .mobile-inline-lyrics {
     max-width: 100%;
     height: min(78vw, 320px);
     border-radius: 26px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(18px);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+    background: rgba(102, 126, 234, 0.9);
+    backdrop-filter: blur(25px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     padding: 18px clamp(14px, 4vw, 20px);
     gap: 12px;
     overflow: hidden;
     cursor: pointer;
     aspect-ratio: 1/1;
     margin: 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 body.mobile-view .mobile-inline-lyrics__hint {
     font-size: 0.78rem;
-    color: rgba(100, 116, 139, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 body.mobile-view .mobile-inline-lyrics__hint i {
@@ -379,24 +383,27 @@ body.mobile-view .mobile-inline-lyrics__content > div {
     text-align: center;
     font-size: clamp(0.8rem, 3.5vw, 0.95rem);
     line-height: 1.6;
-    color: rgba(100, 116, 139, 0.7);
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 body.mobile-view .mobile-inline-lyrics__content div[data-index] {
     text-align: center;
     font-size: clamp(0.82rem, 3.8vw, 0.98rem);
     line-height: 1.6;
-    color: rgba(71, 85, 105, 0.9);
+    color: rgba(255, 255, 255, 0.9);
     padding: 6px 10px;
     border-radius: 14px;
     transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
     word-break: break-word;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 body.mobile-view .mobile-inline-lyrics__content .current {
-    color: var(--lyrics-highlight-text, #f3a25b);
-    background: var(--lyrics-highlight-bg, rgba(243, 162, 91, 0.18));
-    box-shadow: 0 12px 32px var(--lyrics-highlight-shadow, rgba(243, 162, 91, 0.32));
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 32px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 body.mobile-view .mobile-inline-lyrics__scroll::-webkit-scrollbar {
@@ -440,13 +447,15 @@ body.mobile-view .current-song-info {
 body.mobile-view .current-song-title {
     font-size: clamp(1.05rem, 5vw, 1.32rem);
     font-weight: 600;
-    color: #1e293b;
+    color: #ffffff;
     letter-spacing: 0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 body.mobile-view .current-song-artist {
     font-size: 0.95rem;
-    color: rgba(100, 116, 139, 0.8);
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 body.mobile-view .mobile-quality-chip {
@@ -456,15 +465,16 @@ body.mobile-view .mobile-quality-chip {
     gap: 8px;
     padding: 8px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(243, 162, 91, 0.3);
-    background: rgba(243, 162, 91, 0.1);
-    color: rgba(71, 85, 105, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.85rem;
     font-weight: 500;
     letter-spacing: 0.04em;
     margin: 8px auto 0;
     cursor: pointer;
-    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
 }
 
 body.mobile-view .mobile-quality-chip i {
@@ -474,17 +484,18 @@ body.mobile-view .mobile-quality-chip i {
 
 body.mobile-view .mobile-quality-chip:focus-visible,
 body.mobile-view .mobile-quality-chip:hover {
-    background: rgba(243, 162, 91, 0.2);
-    border-color: rgba(243, 162, 91, 0.5);
-    color: #1e293b;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
 body.mobile-view .mobile-quality-chip.active {
-    background: linear-gradient(135deg, rgba(243, 109, 109, 0.9), rgba(243, 162, 91, 0.9));
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.8), rgba(255, 167, 38, 0.8));
     border-color: transparent;
     color: #ffffff;
     transform: translateY(-1px);
-    box-shadow: 0 12px 28px rgba(243, 109, 109, 0.3);
+    box-shadow: 0 12px 28px rgba(255, 107, 107, 0.4);
 }
 
 body.mobile-view .controls {
@@ -548,7 +559,7 @@ body.mobile-view .transport-controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: clamp(4px, 2vw, 8px);
+    gap: clamp(8px, 3vw, 16px);
     padding: 0 clamp(8px, 3vw, 16px);
 }
 
@@ -556,22 +567,24 @@ body.mobile-view .transport-button {
     width: clamp(46px, 14vw, 54px);
     height: clamp(46px, 14vw, 54px);
     border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.9);
-    color: #475569;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    transition: transform 0.25s ease, background 0.25s ease;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(12px);
 }
 
 body.mobile-view .play-mode-btn {
-    background: rgba(255, 255, 255, 0.9);
-    color: #475569;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
     margin: 0;
     order: 1;
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 body.mobile-view .transport-button i {
@@ -582,19 +595,27 @@ body.mobile-view .transport-button--play {
     width: clamp(60px, 18vw, 70px);
     height: clamp(60px, 18vw, 70px);
     border-radius: 50%;
-    background: linear-gradient(135deg, #f36d6d 0%, #f3a25b 100%);
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
     color: #ffffff;
-    box-shadow: 0 12px 28px rgba(243, 117, 109, 0.35);
+    box-shadow: 0 12px 32px rgba(255, 107, 107, 0.4);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0;
     order: 3;
+    border: none;
+    backdrop-filter: none;
 }
 
 body.mobile-view .transport-button:active {
     transform: scale(0.94);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+body.mobile-view .transport-button--play:active {
+    transform: scale(0.94);
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.5);
 }
 
 body.mobile-view .transport-button--prev {
@@ -649,11 +670,12 @@ body.mobile-view .mobile-overlay-scrim {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(4, 6, 10, 0.55);
+    background: rgba(0, 0, 0, 0.6);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease;
     z-index: 40;
+    backdrop-filter: blur(10px);
 }
 
 body.mobile-view.mobile-search-open .mobile-overlay-scrim,
@@ -667,23 +689,23 @@ body.mobile-view .mobile-panel {
     transform: translate(-50%, 110%);
     bottom: 0;
     width: min(100%, 420px);
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(24px);
-    border-radius: 24px 24px 0 0;
+    background: rgba(102, 126, 234, 0.95);
+    backdrop-filter: blur(30px);
+    border-radius: 28px 28px 0 0;
     padding: 16px clamp(16px, 5vw, 24px) calc(env(safe-area-inset-bottom) + clamp(20px, 6vw, 28px));
     display: flex;
     flex-direction: column;
     gap: 16px;
     z-index: 400;
     pointer-events: auto;
-    box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.3);
     transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
     height: calc(100dvh - clamp(100px, 30vw, 180px));
     max-height: calc(100dvh - clamp(100px, 30vw, 180px));
     overflow: hidden;
     overscroll-behavior: contain;
     touch-action: pan-y;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 body.mobile-view.mobile-panel-open .mobile-panel {
@@ -695,7 +717,7 @@ body.mobile-view .mobile-panel-header {
     grid-template-columns: 1fr auto;
     align-items: center;
     column-gap: 12px;
-    color: #1e293b;
+    color: #ffffff;
 }
 
 body.mobile-view .mobile-panel-handle {
@@ -728,13 +750,15 @@ body.mobile-view .mobile-close-btn {
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    border: 1px solid rgba(100, 116, 139, 0.2);
-    background: rgba(255, 255, 255, 0.9);
-    color: #475569;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
     cursor: pointer;
-    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    transition: all 0.3s ease;
     aspect-ratio: 1/1;
     flex-shrink: 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 body.mobile-view .mobile-panel-action-btn i,
@@ -844,12 +868,15 @@ body.mobile-view .playlist-items .playlist-item .playlist-item-remove {
 }
 
 body.mobile-view .playlist-items .playlist-item {
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #475569;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
     touch-action: manipulation;
     cursor: pointer;
     pointer-events: auto;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
 }
 
 body.mobile-view .playlist-items .playlist-item:last-child {
@@ -858,8 +885,11 @@ body.mobile-view .playlist-items .playlist-item:last-child {
 
 body.mobile-view .playlist-items .playlist-item:hover,
 body.mobile-view .playlist-items .playlist-item.current {
-    background: rgba(243, 162, 91, 0.2);
-    color: #1e293b;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 body.mobile-view .lyrics {
@@ -889,8 +919,8 @@ body.mobile-view .search-area {
     inset: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(26px);
+    background: rgba(102, 126, 234, 0.95);
+    backdrop-filter: blur(30px);
     transform: translateY(-100%);
     transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
     z-index: 160;
@@ -939,11 +969,11 @@ body.mobile-view .import-selected-btn {
 /* 播放全部按钮样式 */
 body.mobile-view .play-all-btn {
     width: 100%;
-    padding: 14px 20px;
-    border-radius: 16px;
-    border: 1px solid rgba(243, 162, 91, 0.4);
-    background: linear-gradient(135deg, rgba(243, 109, 109, 0.15), rgba(243, 162, 91, 0.15));
-    color: #f3a25b;
+    padding: 16px 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 167, 38, 0.2));
+    color: #ffffff;
     font-size: 0.95rem;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -953,22 +983,23 @@ body.mobile-view .play-all-btn {
     gap: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 24px rgba(243, 162, 91, 0.2);
-    margin-bottom: 12px;
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+    margin-bottom: 16px;
+    backdrop-filter: blur(10px);
 }
 
 body.mobile-view .play-all-btn:hover,
 body.mobile-view .play-all-btn:focus-visible {
-    background: linear-gradient(135deg, rgba(243, 109, 109, 0.25), rgba(243, 162, 91, 0.25));
-    border-color: rgba(243, 162, 91, 0.6);
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 167, 38, 0.3));
+    border-color: rgba(255, 255, 255, 0.6);
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(243, 162, 91, 0.35);
+    box-shadow: 0 12px 32px rgba(255, 107, 107, 0.4);
 }
 
 body.mobile-view .play-all-btn:active {
     transform: translateY(0);
-    box-shadow: 0 6px 20px rgba(243, 162, 91, 0.25);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
 }
 
 body.mobile-view .play-all-btn i {
@@ -1001,23 +1032,36 @@ body.mobile-view .search-area > :not(.mobile-close-btn) {
 }
 
 body.mobile-view .search-container {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 16px;
+    backdrop-filter: blur(15px);
 }
 
 body.mobile-view .search-input {
-    color: #1e293b;
+    color: #ffffff;
     width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    backdrop-filter: blur(10px);
 }
 
 body.mobile-view .search-input::placeholder {
-    color: rgba(100, 116, 139, 0.6);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+body.mobile-view .search-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 body.mobile-view .source-select-wrapper,
@@ -1028,9 +1072,18 @@ body.mobile-view .search-btn {
 body.mobile-view .source-select-btn,
 body.mobile-view .search-btn {
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #475569;
-    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+body.mobile-view .source-select-btn:hover,
+body.mobile-view .search-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
 }
 
 body.mobile-view .search-btn {
@@ -1231,11 +1284,12 @@ body.mobile-view .mobile-inline-lyrics {
     width: min(78vw, 320px) !important;
     height: min(78vw, 320px) !important;
     border-radius: 26px !important;
-    background: rgba(12, 14, 20, 0.8) !important;
-    backdrop-filter: blur(20px) !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+    background: rgba(102, 126, 234, 0.9) !important;
+    backdrop-filter: blur(25px) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
     display: none !important;
     z-index: 10 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 body.mobile-view.mobile-inline-lyrics-open .mobile-inline-lyrics {
@@ -1412,35 +1466,89 @@ body.mobile-view .transport-button--play {
 body.mobile-view .search-result-item {
     padding: 14px 16px !important;
     min-height: 60px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    margin-bottom: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+body.mobile-view .search-result-item:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
 body.mobile-view .search-result-info {
     min-width: 0 !important;
     flex: 1 !important;
     overflow: hidden !important;
-    max-width: 340px !important; /* 进一步增加信息显示区域宽度 */
+    max-width: 280px !important;
 }
 
 body.mobile-view .search-result-title {
     font-size: 0.95rem !important;
     font-weight: 600 !important;
-    color: #1e293b !important;
+    color: #ffffff !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 320px !important; /* 进一步确保歌名有足够显示空间 */
+    max-width: 100% !important;
     line-height: 1.3 !important;
+    display: block !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
 
 body.mobile-view .search-result-artist {
     font-size: 0.85rem !important;
-    color: rgba(100, 116, 139, 0.8) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 320px !important; /* 进一步增加艺术家显示宽度 */
+    max-width: 100% !important;
     line-height: 1.3 !important;
     margin-top: 2px !important;
+    display: block !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Fix search results container structure */
+body.mobile-view .search-results {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    width: min(100%, 420px) !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+body.mobile-view .search-results-toolbar {
+    width: min(100%, 420px) !important;
+    margin: 0 auto !important;
+    padding-top: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+}
+
+body.mobile-view .search-results-list {
+    width: min(100%, 420px) !important;
+    margin: 0 auto !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+
+/* Ensure search results are properly separated from play-all button */
+body.mobile-view .search-area .search-results {
+    margin-top: 16px !important;
 }
 
 /* === END of Custom Mobile Optimization === */
