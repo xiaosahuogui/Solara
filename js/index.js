@@ -4744,4 +4744,4 @@ function showNotification(message, type = "success", duration = 3000) {
         notification.classList.remove("show");
     }, duration);
 }
-
+    }
