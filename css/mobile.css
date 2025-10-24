@@ -1067,3 +1067,59 @@ body.mobile-view #notification.show {
 body.mobile-view .debug-info {
     display: none;
 }
+
+/* === 修正与优化补丁 START === */
+
+/* 修复专辑封面比例为正圆 */
+body.mobile-view .mobile-turntable,
+body.mobile-view .mobile-turntable__platter,
+body.mobile-view .album-cover,
+body.mobile-view .album-cover img {
+    width: min(72vw, 300px) !important;
+    height: min(72vw, 300px) !important;
+    aspect-ratio: 1 / 1 !important;
+}
+
+/* 去除厚重的圆角黑色容器背景 */
+body.mobile-view .container {
+    background: rgba(20, 20, 25, 0.25) !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(20px) !important;
+    padding: clamp(16px, 5vw, 28px);
+}
+
+body.mobile-view .container::after {
+    display: none !important;
+}
+
+/* 调整其他按钮背景透明度，统一玻璃风格 */
+body.mobile-view .transport-button,
+body.mobile-view .mobile-toolbar__button,
+body.mobile-view .mobile-panel-action-btn,
+body.mobile-view .mobile-close-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* 高亮播放按钮 */
+body.mobile-view .transport-button--play {
+    background: linear-gradient(135deg, #f36d6d 0%, #f3a25b 100%) !important;
+    color: #1f1b1d !important;
+}
+
+/* 当前播放歌曲自动对齐时的视觉提示 */
+body.mobile-view .playlist-items .playlist-item.current {
+    background: rgba(243, 162, 91, 0.25) !important;
+    color: #ffffff !important;
+    scroll-margin: 60px !important;
+}
+
+/* 让播放列表滚动区更顺滑 */
+body.mobile-view .playlist-scroll {
+    scroll-behavior: smooth;
+}
+
+/* === 修正与优化补丁 END === */
