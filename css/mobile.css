@@ -8,10 +8,10 @@ body.mobile-view * {
 html.mobile-view,
 body.mobile-view {
     background:
-        linear-gradient(135deg, #0f1118 0%, #1a1d25 50%, #0d1018 100%),
-        radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.08) 0%, transparent 50%),
-        linear-gradient(45deg, rgba(243, 162, 91, 0.04) 0%, transparent 30%, transparent 70%, rgba(243, 109, 109, 0.04) 100%);
+        linear-gradient(135deg, #1a1d25 0%, #2a2d35 50%, #1a1d25 100%),
+        radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.1) 0%, transparent 50%),
+        linear-gradient(45deg, rgba(243, 162, 91, 0.06) 0%, transparent 30%, transparent 70%, rgba(243, 109, 109, 0.06) 100%);
     color: #f2f5f9;
     height: var(--mobile-vh, 100dvh);
     min-height: var(--mobile-vh, 100dvh);
@@ -47,9 +47,9 @@ body.mobile-view .background-stage {
     html.mobile-view,
     body.mobile-view {
         background:
-            linear-gradient(135deg, #0f1118 0%, #1a1d25 50%, #0d1018 100%),
-            radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.12) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.08) 0%, transparent 50%);
+            linear-gradient(135deg, #1a1d25 0%, #2a2d35 50%, #1a1d25 100%),
+            radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.1) 0%, transparent 50%);
     }
 
     body.mobile-view {
@@ -91,8 +91,8 @@ body.mobile-view .container {
     width: 100%;
     max-width: 420px;
     background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
-        linear-gradient(180deg, rgba(27, 29, 36, 0.85), rgba(13, 16, 24, 0.92));
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%),
+        linear-gradient(180deg, rgba(40, 42, 50, 0.85), rgba(30, 32, 40, 0.92));
     border-radius: 24px;
     padding: clamp(16px, 5vw, 28px);
     padding-top: calc(env(safe-area-inset-top) + clamp(18px, 6vw, 32px));
@@ -1251,14 +1251,14 @@ body.mobile-view.mobile-inline-lyrics-open .mobile-turntable {
 /* ----------- 3. 背景优化：去掉异形渐变，改为干净玻璃风 ----------- */
 html.mobile-view,
 body.mobile-view {
-    background: linear-gradient(145deg, #101217 0%, #1a1d25 100%) !important;
+    background: linear-gradient(145deg, #1a1d25 0%, #2a2d35 100%) !important;
 }
 
 body.mobile-view .container {
-    background: rgba(255, 255, 255, 0.06) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: blur(24px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
     border-radius: 24px !important;
 }
 
@@ -1320,7 +1320,7 @@ body.mobile-view .transport-button--play {
 
 /* === Customized Mobile View Optimization === */
 
-/* 1. 专辑封面：保持正圆比例，移除scale裁剪问题 */
+/* 1. 专辑封面：彻底修复椭圆问题，确保正圆显示 */
 body.mobile-view .album-cover img {
     display: block !important;
     width: 100% !important;
@@ -1328,7 +1328,10 @@ body.mobile-view .album-cover img {
     object-fit: cover !important;
     border-radius: 50% !important;
     aspect-ratio: 1 / 1 !important;
-    transform: none !important; /* 移除 scale 防止边缘裁剪 */
+    transform: none !important;
+    flex-shrink: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
 }
 
 /* 2. 专辑封面容器：保持椭圆比例、结构不动 */
@@ -1342,21 +1345,21 @@ body.mobile-view .album-cover {
 /* 3. 容器背景：亮度调整为柔和玻璃风 */
 body.mobile-view .container {
     background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%),
-        linear-gradient(180deg, rgba(30, 32, 40, 0.85), rgba(20, 22, 30, 0.92)) !important;
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%),
+        linear-gradient(180deg, rgba(45, 47, 55, 0.85), rgba(35, 37, 45, 0.92)) !important;
     backdrop-filter: blur(24px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* 4. 搜索区域：统一宽度为 380px 以内 */
+/* 4. 搜索区域：统一宽度为 420px 以内，比屏幕略窄 */
 body.mobile-view .search-area > :not(.mobile-close-btn),
 body.mobile-view .search-container,
 body.mobile-view .search-results,
 body.mobile-view .search-results-list,
 body.mobile-view .search-results-toolbar {
-    width: min(100%, 380px) !important;
-    max-width: 95vw !important;
+    width: min(100%, 420px) !important;
+    max-width: 92vw !important; /* 比屏幕略窄 */
 }
 
 /* 5. 搜索结果文本处理 */
@@ -1387,8 +1390,9 @@ body.mobile-view .playlist-items .playlist-item.current {
 body.mobile-view .transport-controls {
     justify-content: center !important;
     align-items: center !important;
-    gap: clamp(16px, 6vw, 28px) !important; /* 增加按钮间距 */
-    padding: 12px 0 24px !important; /* 下方留白更均衡 */
+    gap: clamp(20px, 7vw, 32px) !important; /* 增加按钮间距，更协调 */
+    padding: 16px 0 28px !important; /* 增加上下间距，更均衡 */
+    margin-top: 8px !important; /* 与上方内容保持适当距离 */
 }
 
 body.mobile-view .transport-button {
