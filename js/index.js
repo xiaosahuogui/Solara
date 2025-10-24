@@ -4772,6 +4772,4 @@ function setupInteractions() {
 				    setTimeout(() => {
 				        notification.classList.remove("show");
 				    }, duration);
-				}
-				}
-		}
+                }}}}}
