@@ -2,7 +2,7 @@
  * Mobile-specific layout (v2 Optimized & Refactored)
  * Theme: Dark Glass (Unified)
  * Date: 2025-10-24
- * Fix: v2.1 (Corrected aspect ratio for album cover)
+ * Fix: v2.2 (Corrected album cover aspect ratio & search result item width)
  */
 
 /* === 1. Global Setup & Body === */
@@ -181,7 +181,6 @@ body.mobile-view .mobile-turntable {
     justify-content: center;
     align-items: center;
     width: min(72vw, 300px);
-    /* UPDATED: height set to auto to respect aspect-ratio */
     height: auto;
     margin: 0 auto;
     aspect-ratio: 1/1;
@@ -229,7 +228,6 @@ body.mobile-view .album-cover {
     top: 50%;
     left: 50%;
     width: 56%;
-    /* UPDATED: height set to auto to respect aspect-ratio */
     height: auto;
     transform: translate(-50%, -50%);
     border-radius: 50%;
@@ -287,7 +285,6 @@ body.mobile-view .mobile-inline-lyrics {
     left: 50%;
     transform: translate(-50%, -50%);
     width: min(78vw, 320px);
-    /* UPDATED: height set to auto to respect aspect-ratio */
     height: auto;
     border-radius: 26px;
     background: rgba(35, 37, 45, 0.9);
@@ -1039,6 +1036,7 @@ body.mobile-view .search-results-list {
 /* Individual search result item */
 body.mobile-view .search-result-item {
     padding: 14px 16px;
+    padding-right: 56px; /* NEW: Increased padding to make space for action button */
     min-height: 60px;
     display: flex;
     align-items: center;
@@ -1048,6 +1046,7 @@ body.mobile-view .search-result-item {
     border: 1px solid rgba(255, 255, 255, 0.25);
     margin-bottom: 8px;
     transition: all 0.3s ease;
+    position: relative; /* NEW: Needed for absolute positioning of action button */
 }
 
 body.mobile-view .search-result-item:hover {
@@ -1091,6 +1090,38 @@ body.mobile-view .search-result-artist {
     display: block;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
+
+/* NEW: Action button inside search result item (position: absolute) */
+body.mobile-view .search-result-item .search-result-action-btn {
+    position: absolute;
+    right: 12px; /* Position it relative to the right edge */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px; /* Slightly larger button */
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+body.mobile-view .search-result-item .search-result-action-btn:hover {
+    background: rgba(243, 162, 91, 0.2);
+    border-color: rgba(243, 162, 91, 0.5);
+}
+
+body.mobile-view .search-result-item .search-result-action-btn i {
+    font-size: 1.1rem;
+}
+
 
 /* === 13. Notification === */
 
