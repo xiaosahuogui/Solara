@@ -570,31 +570,33 @@ const API = {
     },
 
     search: async (keyword, source = "kuwo", count = 50, page = 1) => {
-        const signature = API.generateSignature();
-        const url = `${API.baseUrl}?types=search&source=${source}&name=${encodeURIComponent(keyword)}&count=${count}&pages=${page}&s=${signature}`;
+    const signature = API.generateSignature();
+    const url = `${API.baseUrl}?types=search&source=${source}&name=${encodeURIComponent(keyword)}&count=${count}&pages=${page}&s=${signature}`;
 
-        try {
-            debugLog(`API请求: ${url}`);
-            const data = await API.fetchJson(url);
-            debugLog(`API响应: ${JSON.stringify(data).substring(0, 200)}...`);
+    try {
+        debugLog(`API请求: ${url}`);
+        const data = await API.fetchJson(url);
+        debugLog(`API响应: ${JSON.stringify(data).substring(0, 200)}...`);
 
-            if (!Array.isArray(data)) throw new Error("搜索结果格式错误");
-
-            return data.map(song => ({
-                id: song.id,
-                name: song.name,
-                artist: song.artist,
-                album: song.album,
-                pic_id: song.pic_id,
-                url_id: song.url_id,
-                lyric_id: song.lyric_id,
-                source: song.source,
-            }));
-        } catch (error) {
-            debugLog(`API错误: ${error.message}`);
-            throw error;
+        if (!Array.isArray(data)) {
+            throw new Error("搜索结果格式错误");
         }
-    },
+
+        return data.map(song => ({
+            id: song.id,
+            name: song.name,
+            artist: song.artist,
+            album: song.album,
+            pic_id: song.pic_id,
+            url_id: song.url_id,
+            lyric_id: song.lyric_id,
+            source: song.source,
+        }));
+    } catch (error) {
+        debugLog(`API错误: ${error.message}`);
+        throw error;
+    }
+},
 
     getRadarPlaylist: async (playlistId = "3778678", options = {}) => {
         const signature = API.generateSignature();
