@@ -2,7 +2,7 @@
  * Mobile-specific layout (v2 Optimized & Refactored)
  * Theme: Dark Glass (Unified)
  * Date: 2025-10-24
- * Fix: v2.2 (Corrected album cover aspect ratio & search result item width)
+ * Fix: v2.3 (Corrected album cover aspect ratio & restored search result text visibility/truncation)
  */
 
 /* === 1. Global Setup & Body === */
@@ -1036,7 +1036,7 @@ body.mobile-view .search-results-list {
 /* Individual search result item */
 body.mobile-view .search-result-item {
     padding: 14px 16px;
-    padding-right: 56px; /* NEW: Increased padding to make space for action button */
+    padding-right: 56px; /* Increased padding to make space for action button */
     min-height: 60px;
     display: flex;
     align-items: center;
@@ -1046,7 +1046,7 @@ body.mobile-view .search-result-item {
     border: 1px solid rgba(255, 255, 255, 0.25);
     margin-bottom: 8px;
     transition: all 0.3s ease;
-    position: relative; /* NEW: Needed for absolute positioning of action button */
+    position: relative; /* Needed for absolute positioning of action button */
 }
 
 body.mobile-view .search-result-item:hover {
@@ -1071,7 +1071,7 @@ body.mobile-view .search-result-title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%; /* Takes 100% of its parent (.search-result-info) */
+    /* max-width: 100%;  <--- REMOVED THIS FIX COLLAPSE ISSUE */
     line-height: 1.3;
     display: block;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -1084,20 +1084,20 @@ body.mobile-view .search-result-artist {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
+    /* max-width: 100%;  <--- REMOVED THIS FIX COLLAPSE ISSUE */
     line-height: 1.3;
     margin-top: 2px;
     display: block;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* NEW: Action button inside search result item (position: absolute) */
+/* Action button inside search result item (position: absolute) */
 body.mobile-view .search-result-item .search-result-action-btn {
     position: absolute;
     right: 12px; /* Position it relative to the right edge */
     top: 50%;
     transform: translateY(-50%);
-    width: 34px; /* Slightly larger button */
+    width: 34px;
     height: 34px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.25);
