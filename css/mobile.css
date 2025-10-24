@@ -1539,3 +1539,8 @@ body.mobile-view .search-area .search-results {
 }
 
 /* === END of Custom Mobile Optimization === */
+
+/* === 修复搜索页面被毛玻璃遮挡问题 === */
+body.mobile-view.mobile-search-open .mobile-overlay-scrim {
+    display: none !important;
+}
