@@ -919,8 +919,7 @@ body.mobile-view .search-area {
     inset: 0;
     width: 100%;
     height: 100%;
-    background: rgba(102, 126, 234, 0.95);
-    backdrop-filter: blur(30px);
+    background: rgba(102, 126, 234, 0.98);
     transform: translateY(-100%);
     transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
     z-index: 160;
@@ -1012,56 +1011,42 @@ body.mobile-view .search-results-list {
 }
 
 body.mobile-view .search-area > :not(.mobile-close-btn) {
-    width: min(100%, 360px);
+    width: min(100%, 420px);
     align-self: center;
-}
-
-body.mobile-view .search-area > :not(.mobile-close-btn) {
-    width: min(100%, 340px);
-    align-self: center;
-}
-
-body.mobile-view .search-area > :not(.mobile-close-btn) {
-    width: min(100%, 340px);
-    align-self: center;
-}
-
-body.mobile-view .search-area > :not(.mobile-close-btn) {
-    width: min(100%, 340px);
-    align-self: center;
+    max-width: 96vw;
 }
 
 body.mobile-view .search-container {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-    backdrop-filter: blur(15px);
 }
 
 body.mobile-view .search-input {
     color: #ffffff;
     width: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 12px;
     padding: 12px 16px;
     font-size: 1rem;
-    backdrop-filter: blur(10px);
 }
 
 body.mobile-view .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 body.mobile-view .search-input:focus {
-    outline: none;
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.15);
+    outline: 2px solid rgba(243, 162, 91, 0.8);
+    outline-offset: 2px;
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 0 4px rgba(243, 162, 91, 0.2);
 }
 
 body.mobile-view .source-select-wrapper,
@@ -1072,10 +1057,9 @@ body.mobile-view .search-btn {
 body.mobile-view .source-select-btn,
 body.mobile-view .search-btn {
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
 }
 
@@ -1406,7 +1390,6 @@ body.mobile-view .container {
 }
 
 /* 4. 搜索区域：统一宽度为 420px 以内，比屏幕略窄 */
-body.mobile-view .search-area > :not(.mobile-close-btn),
 body.mobile-view .search-container,
 body.mobile-view .search-results,
 body.mobile-view .search-results-list,
@@ -1470,9 +1453,8 @@ body.mobile-view .search-result-item {
     align-items: center !important;
     gap: 12px !important;
     border-radius: 14px !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(10px) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
     margin-bottom: 8px !important;
     transition: all 0.3s ease !important;
 }
