@@ -2210,6 +2210,259 @@ async function restoreCurrentSongState() {
 	}
 }
 
+// 修复：自动播放下一首 - 支持播放模式
+function autoPlayNext() {
+	if (dom.audioPlayer && dom.audioPlayer.__solaraMediaSessionHandledEnded === 'skip') {
+		dom.audioPlayer.__solaraMediaSessionHandledEnded = false;
+		return;
+	}
+
+	// 在播放下一首前检查是否需要静默加载新歌
+	silentlyLoadMoreRadarSongs();
+
+	if (state.playMode === "single") {
+		// 单曲循环
+		dom.audioPlayer.currentTime = 0;
+		dom.audioPlayer.play();
+		return;
+	}
+
+	playNext();
+	updatePlayPauseButton();
+}
+
+// 探索雷达函数
+async function exploreOnlineMusic() {
+	console.log('探索雷达函数被调用');
+
+	if (!dom.loadOnlineBtn) {
+		console.error('探索雷达按钮未找到');
+		showNotification("探索雷达功能暂不可用", "error");
+		return;
+	}
+
+	const btn = dom.loadOnlineBtn;
+	const btnText = btn.querySelector(".btn-text");
+	const loader = btn.querySelector(".loader");
+
+	if (!btnText || !loader) {
+		console.error('探索雷达按钮内部元素未找到');
+		return;
+	}
+
+	try {
+		btn.disabled = true;
+		btnText.style.display = "none";
+		loader.style.display = "inline-block";
+
+		console.log('开始探索雷达搜索...');
+		state.onlineSongs = [];
+
+		// 随机选择一个关键词
+		const randomKeyword = RANDOM_KEYWORDS[Math.floor(Math.random() * RANDOM_KEYWORDS.length)];
+		console.log(`使用关键词: ${randomKeyword}`);
+
+		// 使用酷我音乐源搜索随机关键词
+		const songs = await API.search(randomKeyword, 'kuwo', 20, 1);
+		console.log(`搜索到 ${songs.length} 首歌曲`);
+
+		if (songs && songs.length > 0) {
+			// 去重逻辑
+			const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
+			const uniqueSongs = songs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
+
+			console.log(`去重后剩余 ${uniqueSongs.length} 首歌曲`);
+
+			if (uniqueSongs.length > 0) {
+				state.playlistSongs = [...state.playlistSongs, ...uniqueSongs];
+				state.onlineSongs = uniqueSongs;
+
+				if (!state.currentSong && uniqueSongs.length > 0) {
+					state.currentTrackIndex = state.playlistSongs.length - uniqueSongs.length;
+					state.currentPlaylist = "playlist";
+					await playPlaylistSong(state.currentTrackIndex);
+				}
+
+				renderPlaylist();
+				showNotification(`探索雷达已添加 ${uniqueSongs.length} 首随机歌曲 (关键词: ${randomKeyword})`);
+				console.log(`探索雷达成功添加 ${uniqueSongs.length} 首歌曲`);
+			} else {
+				showNotification("所有歌曲都已存在于播放列表中", "info");
+			}
+		} else {
+			showNotification("未找到相关歌曲，请稍后重试", "error");
+		}
+	} catch (error) {
+		console.error("探索雷达失败:", error);
+		showNotification("探索失败，请稍后重试", "error");
+	} finally {
+		btn.disabled = false;
+		if (btnText) btnText.style.display = "flex";
+		if (loader) loader.style.display = "none";
+	}
+}
+
+// 搜索函数
+async function performSearch(isLiveSearch = false) {
+	const query = dom.searchInput.value.trim();
+	if (!query) {
+		showNotification("请输入搜索关键词", "error");
+		return;
+	}
+
+	if (state.sourceMenuOpen) {
+		closeSourceMenu();
+	}
+
+	const source = normalizeSource(state.searchSource);
+	state.searchSource = source;
+	safeSetLocalStorage("searchSource", source);
+	updateSourceLabel();
+	buildSourceMenu();
+
+	if (!isLiveSearch) {
+		state.searchPage = 1;
+		state.searchKeyword = query;
+		state.searchSource = source;
+		state.searchResults = [];
+		state.hasMoreResults = true;
+		state.renderedSearchCount = 0;
+		resetSelectedSearchResults();
+		const listContainer = dom.searchResultsList || dom.searchResults;
+		if (listContainer) {
+			listContainer.innerHTML = "";
+		}
+		debugLog(`开始新搜索: ${query}, 来源: ${source}`);
+	} else {
+		state.searchKeyword = query;
+		state.searchSource = source;
+	}
+
+	try {
+		dom.searchBtn.disabled = true;
+		dom.searchBtn.innerHTML = '<span class="loader"></span><span>搜索中...</span>';
+
+		showSearchResults();
+		debugLog("已切换到搜索模式");
+
+		// 执行搜索
+		const results = await API.search(query, source, 20, state.searchPage);
+		debugLog(`API返回结果数量: ${results.length}`);
+
+		if (state.searchPage === 1) {
+			state.searchResults = results;
+		} else {
+			state.searchResults = [...state.searchResults, ...results];
+		}
+
+		state.hasMoreResults = results.length === 20;
+
+		displaySearchResults(results, {
+			reset: state.searchPage === 1,
+			totalCount: state.searchResults.length,
+		});
+		debugLog(`搜索完成: 总共显示 ${state.searchResults.length} 个结果`);
+
+		if (state.searchResults.length === 0) {
+			showNotification("未找到相关歌曲", "error");
+		}
+
+	} catch (error) {
+		console.error("搜索失败:", error);
+		showNotification("搜索失败，请稍后重试", "error");
+		hideSearchResults();
+		debugLog(`搜索失败: ${error.message}`);
+	} finally {
+		dom.searchBtn.disabled = false;
+		dom.searchBtn.innerHTML = '<i class="fas fa-search"></i><span>搜索</span>';
+	}
+}
+
+// 静默加载新的探索雷达歌曲
+async function silentlyLoadMoreRadarSongs() {
+	if (state.playlistSongs.length === 0) return;
+
+	// 计算剩余歌曲数量（从当前播放位置到列表末尾）
+	const remainingSongs = state.playlistSongs.length - state.currentTrackIndex - 1;
+
+	// 如果剩余歌曲少于5首，静默加载新歌
+	if (remainingSongs <= 5) {
+		try {
+			debugLog("探索雷达: 剩余歌曲不足，静默加载新歌...");
+
+			// 随机选择关键词
+			const randomKeyword = RANDOM_KEYWORDS[Math.floor(Math.random() * RANDOM_KEYWORDS.length)];
+
+			// 使用酷我音乐源搜索
+			const newSongs = await API.search(randomKeyword, 'kuwo', 10, 1);
+
+			if (newSongs.length > 0) {
+				// 去重逻辑
+				const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
+				const uniqueNewSongs = newSongs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
+
+				if (uniqueNewSongs.length > 0) {
+					// 静默添加到播放列表末尾
+					state.playlistSongs = [...state.playlistSongs, ...uniqueNewSongs];
+
+					// 更新播放列表显示，但不强制滚动
+					renderPlaylist();
+
+					debugLog(`探索雷达静默加载: 关键词 "${randomKeyword}", 添加 ${uniqueNewSongs.length} 首新歌`);
+
+					// 显示一个不显眼的通知
+					showNotification(`探索雷达已静默添加 ${uniqueNewSongs.length} 首新歌`, "info", 2000);
+				}
+			}
+		} catch (error) {
+			console.warn("静默加载探索雷达歌曲失败:", error);
+			// 静默失败，不显示错误提示
+		}
+	}
+}
+
+// 修复：播放下一首 - 支持播放模式和统一播放列表
+function playNext() {
+	let nextIndex = -1;
+	let playlist = [];
+
+	if (state.currentPlaylist === "playlist") {
+		playlist = state.playlistSongs;
+	} else if (state.currentPlaylist === "online") {
+		playlist = state.onlineSongs;
+	} else if (state.currentPlaylist === "search") {
+		playlist = state.searchResults;
+	}
+
+	if (playlist.length === 0) return;
+
+	if (state.playMode === "random") {
+		// 随机播放
+		nextIndex = Math.floor(Math.random() * playlist.length);
+	} else {
+		// 列表循环
+		nextIndex = (state.currentTrackIndex + 1) % playlist.length;
+	}
+
+	state.currentTrackIndex = nextIndex;
+
+	if (state.currentPlaylist === "playlist") {
+		playPlaylistSong(nextIndex);
+	} else if (state.currentPlaylist === "online") {
+		playOnlineSong(nextIndex);
+	} else if (state.currentPlaylist === "search") {
+		playSearchResult(nextIndex);
+	}
+}
+
+// 将关键函数暴露到全局作用域
+window.exploreOnlineMusic = exploreOnlineMusic;
+window.performSearch = performSearch;
+window.togglePlayPause = togglePlayPause;
+window.togglePlayerQualityMenu = togglePlayerQualityMenu;
+window.togglePlayMode = togglePlayMode;
+window.autoPlayNext = autoPlayNext;
+
 window.addEventListener("load", setupInteractions);
 dom.audioPlayer.addEventListener("ended", autoPlayNext);
 
@@ -4190,104 +4443,9 @@ function setupInteractions() {
 						}
 					}
 
-					// 静默加载新的探索雷达歌曲
-					async function silentlyLoadMoreRadarSongs() {
-						if (state.playlistSongs.length === 0) return;
-
-						// 计算剩余歌曲数量（从当前播放位置到列表末尾）
-						const remainingSongs = state.playlistSongs.length - state.currentTrackIndex - 1;
-
-						// 如果剩余歌曲少于5首，静默加载新歌
-						if (remainingSongs <= 5) {
-							try {
-								debugLog("探索雷达: 剩余歌曲不足，静默加载新歌...");
-
-								// 随机选择关键词
-								const randomKeyword = RANDOM_KEYWORDS[Math.floor(Math.random() * RANDOM_KEYWORDS.length)];
-
-								// 使用酷我音乐源搜索
-								const newSongs = await API.search(randomKeyword, 'kuwo', 10, 1);
-
-								if (newSongs.length > 0) {
-									// 去重逻辑
-									const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
-									const uniqueNewSongs = newSongs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
-
-									if (uniqueNewSongs.length > 0) {
-										// 静默添加到播放列表末尾
-										state.playlistSongs = [...state.playlistSongs, ...uniqueNewSongs];
-
-										// 更新播放列表显示，但不强制滚动
-										renderPlaylist();
-
-										debugLog(`探索雷达静默加载: 关键词 "${randomKeyword}", 添加 ${uniqueNewSongs.length} 首新歌`);
-
-										// 显示一个不显眼的通知
-										showNotification(`探索雷达已静默添加 ${uniqueNewSongs.length} 首新歌`, "info", 2000);
-									}
-								}
-							} catch (error) {
-								console.warn("静默加载探索雷达歌曲失败:", error);
-								// 静默失败，不显示错误提示
-							}
-						}
-					}
 
 
-					// 修复：自动播放下一首 - 支持播放模式
-					function autoPlayNext() {
-						if (dom.audioPlayer && dom.audioPlayer.__solaraMediaSessionHandledEnded === 'skip') {
-							dom.audioPlayer.__solaraMediaSessionHandledEnded = false;
-							return;
-						}
 
-						// 在播放下一首前检查是否需要静默加载新歌
-						silentlyLoadMoreRadarSongs();
-
-						if (state.playMode === "single") {
-							// 单曲循环
-							dom.audioPlayer.currentTime = 0;
-							dom.audioPlayer.play();
-							return;
-						}
-
-						playNext();
-						updatePlayPauseButton();
-					}
-
-					// 修复：播放下一首 - 支持播放模式和统一播放列表
-					function playNext() {
-						let nextIndex = -1;
-						let playlist = [];
-
-						if (state.currentPlaylist === "playlist") {
-							playlist = state.playlistSongs;
-						} else if (state.currentPlaylist === "online") {
-							playlist = state.onlineSongs;
-						} else if (state.currentPlaylist === "search") {
-							playlist = state.searchResults;
-						}
-
-						if (playlist.length === 0) return;
-
-						if (state.playMode === "random") {
-							// 随机播放
-							nextIndex = Math.floor(Math.random() * playlist.length);
-						} else {
-							// 列表循环
-							nextIndex = (state.currentTrackIndex + 1) % playlist.length;
-						}
-
-						state.currentTrackIndex = nextIndex;
-
-						if (state.currentPlaylist === "playlist") {
-							playPlaylistSong(nextIndex);
-						} else if (state.currentPlaylist === "online") {
-							playOnlineSong(nextIndex);
-						} else if (state.currentPlaylist === "search") {
-							playSearchResult(nextIndex);
-						}
-					}
 
 					// 修复：播放上一首 - 支持播放模式和统一播放列表
 					function playPrevious() {
@@ -4355,152 +4513,7 @@ function setupInteractions() {
 					}
 
 					// 修复：探索在线音乐 - 添加到统一播放列表
-					// 探索雷达函数
-					async function exploreOnlineMusic() {
-						console.log('探索雷达函数被调用');
 
-						if (!dom.loadOnlineBtn) {
-							console.error('探索雷达按钮未找到');
-							showNotification("探索雷达功能暂不可用", "error");
-							return;
-						}
-
-						const btn = dom.loadOnlineBtn;
-						const btnText = btn.querySelector(".btn-text");
-						const loader = btn.querySelector(".loader");
-
-						if (!btnText || !loader) {
-							console.error('探索雷达按钮内部元素未找到');
-							return;
-						}
-
-						try {
-							btn.disabled = true;
-							btnText.style.display = "none";
-							loader.style.display = "inline-block";
-
-							console.log('开始探索雷达搜索...');
-							state.onlineSongs = [];
-
-							// 随机选择一个关键词
-							const randomKeyword = RANDOM_KEYWORDS[Math.floor(Math.random() * RANDOM_KEYWORDS.length)];
-							console.log(`使用关键词: ${randomKeyword}`);
-
-							// 使用酷我音乐源搜索随机关键词
-							const songs = await API.search(randomKeyword, 'kuwo', 20, 1);
-							console.log(`搜索到 ${songs.length} 首歌曲`);
-
-							if (songs && songs.length > 0) {
-								// 去重逻辑
-								const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
-								const uniqueSongs = songs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
-
-								console.log(`去重后剩余 ${uniqueSongs.length} 首歌曲`);
-
-								if (uniqueSongs.length > 0) {
-									state.playlistSongs = [...state.playlistSongs, ...uniqueSongs];
-									state.onlineSongs = uniqueSongs;
-
-									if (!state.currentSong && uniqueSongs.length > 0) {
-										state.currentTrackIndex = state.playlistSongs.length - uniqueSongs.length;
-										state.currentPlaylist = "playlist";
-										await playPlaylistSong(state.currentTrackIndex);
-									}
-
-									renderPlaylist();
-									showNotification(`探索雷达已添加 ${uniqueSongs.length} 首随机歌曲 (关键词: ${randomKeyword})`);
-									console.log(`探索雷达成功添加 ${uniqueSongs.length} 首歌曲`);
-								} else {
-									showNotification("所有歌曲都已存在于播放列表中", "info");
-								}
-							} else {
-								showNotification("未找到相关歌曲，请稍后重试", "error");
-							}
-						} catch (error) {
-							console.error("探索雷达失败:", error);
-							showNotification("探索失败，请稍后重试", "error");
-						} finally {
-							btn.disabled = false;
-							if (btnText) btnText.style.display = "flex";
-							if (loader) loader.style.display = "none";
-						}
-					}
-
-					// 搜索函数
-					async function performSearch(isLiveSearch = false) {
-						const query = dom.searchInput.value.trim();
-						if (!query) {
-							showNotification("请输入搜索关键词", "error");
-							return;
-						}
-
-						if (state.sourceMenuOpen) {
-							closeSourceMenu();
-						}
-
-						const source = normalizeSource(state.searchSource);
-						state.searchSource = source;
-						safeSetLocalStorage("searchSource", source);
-						updateSourceLabel();
-						buildSourceMenu();
-
-						if (!isLiveSearch) {
-							state.searchPage = 1;
-							state.searchKeyword = query;
-							state.searchSource = source;
-							state.searchResults = [];
-							state.hasMoreResults = true;
-							state.renderedSearchCount = 0;
-							resetSelectedSearchResults();
-							const listContainer = dom.searchResultsList || dom.searchResults;
-							if (listContainer) {
-								listContainer.innerHTML = "";
-							}
-							debugLog(`开始新搜索: ${query}, 来源: ${source}`);
-						} else {
-							state.searchKeyword = query;
-							state.searchSource = source;
-						}
-
-						try {
-							dom.searchBtn.disabled = true;
-							dom.searchBtn.innerHTML = '<span class="loader"></span><span>搜索中...</span>';
-
-							showSearchResults();
-							debugLog("已切换到搜索模式");
-
-							// 执行搜索
-							const results = await API.search(query, source, 20, state.searchPage);
-							debugLog(`API返回结果数量: ${results.length}`);
-
-							if (state.searchPage === 1) {
-								state.searchResults = results;
-							} else {
-								state.searchResults = [...state.searchResults, ...results];
-							}
-
-							state.hasMoreResults = results.length === 20;
-
-							displaySearchResults(results, {
-								reset: state.searchPage === 1,
-								totalCount: state.searchResults.length,
-							});
-							debugLog(`搜索完成: 总共显示 ${state.searchResults.length} 个结果`);
-
-							if (state.searchResults.length === 0) {
-								showNotification("未找到相关歌曲", "error");
-							}
-
-						} catch (error) {
-							console.error("搜索失败:", error);
-							showNotification("搜索失败，请稍后重试", "error");
-							hideSearchResults();
-							debugLog(`搜索失败: ${error.message}`);
-						} finally {
-							dom.searchBtn.disabled = false;
-							dom.searchBtn.innerHTML = '<i class="fas fa-search"></i><span>搜索</span>';
-						}
-					}
 
 					// 修复：加载歌词
 					async function loadLyrics(song) {
