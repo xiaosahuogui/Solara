@@ -178,9 +178,17 @@ function openMobilePanel(view = "playlist") {
     // 如果是播放列表视图，添加自动滚动
     if (view === "playlist") {
         debugLog("移动端打开播放列表面板，准备自动滚动");
+        // 确保播放列表视图已激活后再滚动
         setTimeout(() => {
-            scrollToCurrentPlaylistItem();
-        }, 300);
+            if (dom.playlist && dom.playlist.classList.contains("active")) {
+                scrollToCurrentPlaylistItem();
+            } else {
+                debugLog("播放列表视图未激活，延迟滚动");
+                setTimeout(() => {
+                    scrollToCurrentPlaylistItem();
+                }, 100);
+            }
+        }, 350);
     }
     return result;
 }
@@ -663,6 +671,8 @@ const state = {
     sourceMenuOpen: false,
     userScrolledLyrics: false, // 新增：用户是否手动滚动歌词
     lyricsScrollTimeout: null, // 新增：歌词滚动超时
+    userScrolledPlaylist: false, // 新增：用户是否手动滚动播放列表
+    playlistScrollTimeout: null, // 新增：播放列表滚动超时
     themeDefaultsCaptured: false,
     dynamicPalette: null,
     currentPaletteImage: null,
@@ -2362,7 +2372,7 @@ function setupInteractions() {
                 // 移动端延迟滚动，等待面板动画完成
                 setTimeout(() => {
                     scrollToCurrentPlaylistItem();
-                }, 300);
+                }, 400);
             } else {
                 switchMobileView("playlist");
                 // 桌面端立即滚动，确保播放列表视图已激活
@@ -2534,6 +2544,21 @@ function setupInteractions() {
         }
 
         savePlayerState();
+        
+        // 添加播放列表滚动监听器
+        if (isMobileView && dom.playlist) {
+            const playlistScroll = dom.playlist.querySelector('.playlist-scroll');
+            if (playlistScroll) {
+                playlistScroll.addEventListener('scroll', () => {
+                    // 用户手动滚动时，暂时禁用自动滚动
+                    state.userScrolledPlaylist = true;
+                    clearTimeout(state.playlistScrollTimeout);
+                    state.playlistScrollTimeout = setTimeout(() => {
+                        state.userScrolledPlaylist = false;
+                    }, 5000);
+                }, { passive: true });
+            }
+        }
     } else {
         dom.playlist.classList.add("empty");
         if (dom.playlistItems) {
@@ -3583,7 +3608,7 @@ function renderPlaylist() {
         debugLog("渲染播放列表: 检测到当前播放歌曲，准备自动滚动");
         setTimeout(() => {
             scrollToCurrentPlaylistItem();
-        }, 100);
+        }, 150);
     }
 }
 
@@ -3710,7 +3735,7 @@ async function playPlaylistSong(index) {
         // 播放后自动滚动到当前歌曲
         setTimeout(() => {
             scrollToCurrentPlaylistItem();
-        }, 200);
+        }, 300);
         if (isMobileView) {
             closeMobilePanel();
         }
@@ -3727,33 +3752,44 @@ function scrollToCurrentPlaylistItem() {
         return;
     }
     
-    // 确保播放列表容器可见
-    if (dom.playlist && dom.playlist.classList.contains("active")) {
-        debugLog("播放列表已激活，可以滚动");
+    // 确保播放列表容器可见且已渲染
+    if (!dom.playlist || !dom.playlist.classList.contains("active")) {
+        debugLog("播放列表视图未激活，无法滚动");
+        return;
+    }
+    
+    // 如果用户手动滚动了播放列表，暂时不自动滚动
+    if (state.userScrolledPlaylist) {
+        debugLog("用户手动滚动了播放列表，跳过自动滚动");
+        return;
     }
     
     const currentItem = dom.playlistItems.querySelector(`.playlist-item[data-index="${state.currentTrackIndex}"]`);
     if (!currentItem) {
         debugLog(`播放列表滚动: 找不到当前歌曲元素, index=${state.currentTrackIndex}`);
-        // 尝试重新渲染播放列表后再次滚动
+        // 如果找不到元素，可能是DOM还未更新，延迟重试
         setTimeout(() => {
             const retryItem = dom.playlistItems.querySelector(`.playlist-item[data-index="${state.currentTrackIndex}"]`);
             if (retryItem) {
                 debugLog("重试滚动成功");
                 scrollToCurrentPlaylistItem();
+            } else {
+                debugLog("重试滚动失败，元素仍未找到");
             }
-        }, 100);
+        }, 200);
         return;
     }
     
-    const container = dom.playlistItems;
-    const containerHeight = container.clientHeight;
-    const itemRect = currentItem.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
+    // 使用正确的滚动容器 - 移动端应该是 playlist-scroll
+    const container = dom.playlist.querySelector('.playlist-scroll') || dom.playlistItems;
+    if (!container) {
+        debugLog("找不到滚动容器");
+        return;
+    }
     
-    // 计算元素在容器内部的可视位置
-    const itemOffsetTop = itemRect.top - containerRect.top + container.scrollTop;
-    const itemHeight = itemRect.height;
+    const containerHeight = container.clientHeight;
+    const itemOffsetTop = currentItem.offsetTop;
+    const itemHeight = currentItem.offsetHeight;
     
     // 目标滚动位置：让当前歌曲的中心与容器中心对齐
     const targetScrollTop = itemOffsetTop - (containerHeight / 2) + (itemHeight / 2);
@@ -3770,7 +3806,7 @@ function scrollToCurrentPlaylistItem() {
         } else {
             container.scrollTop = finalScrollTop;
         }
-        debugLog(`播放列表滚动: 当前歌曲索引=${state.currentTrackIndex}, 目标滚动位置=${finalScrollTop}, 容器高度=${containerHeight}`);
+        debugLog(`播放列表滚动: 当前歌曲索引=${state.currentTrackIndex}, 目标滚动位置=${finalScrollTop}, 容器高度=${containerHeight}, 元素偏移=${itemOffsetTop}`);
     } else {
         debugLog(`播放列表滚动: 无需滚动, 当前位置=${container.scrollTop}, 目标位置=${finalScrollTop}`);
     }
@@ -4529,6 +4565,49 @@ window.ensurePlaylistScroll = function() {
 };
 
 // 在切换视图时确保滚动
+if (typeof window.switchMobileView === "function") {
+    const originalSwitchMobileView = window.switchMobileView;
+    window.switchMobileView = function(view) {
+        originalSwitchMobileView(view);
+        if (view === "playlist") {
+            debugLog("切换到播放列表视图，准备自动滚动");
+            setTimeout(() => {
+                scrollToCurrentPlaylistItem();
+            }, 150);
+        }
+    };
+}
+
+// 新增：强制滚动到当前播放列表项目（用于调试）
+window.forceScrollToCurrentPlaylistItem = function() {
+    debugLog("强制滚动到当前播放列表项目");
+    scrollToCurrentPlaylistItem();
+};
+
+// 新增：测试播放列表滚动功能
+window.testPlaylistScroll = function() {
+    debugLog("测试播放列表滚动功能");
+    if (state.currentPlaylist === "playlist" && state.currentTrackIndex >= 0) {
+        debugLog(`当前播放列表: ${state.currentPlaylist}, 当前歌曲索引: ${state.currentTrackIndex}`);
+        scrollToCurrentPlaylistItem();
+        showNotification("正在滚动到当前播放歌曲", "success");
+    } else {
+        debugLog("没有正在播放的歌曲或不在播放列表模式");
+        showNotification("没有正在播放的歌曲或不在播放列表模式", "error");
+    }
+};
+
+// 新增：确保播放列表显示时自动滚动到当前歌曲
+window.ensurePlaylistScroll = function() {
+    if (dom.playlist && dom.playlist.classList.contains("active")) {
+        debugLog("播放列表已激活，触发自动滚动");
+        setTimeout(() => {
+            scrollToCurrentPlaylistItem();
+        }, 150);
+    }
+};
+
+// 在切换视图时确保滚动
 const originalSwitchMobileView = window.switchMobileView;
 window.switchMobileView = function(view) {
     originalSwitchMobileView(view);
@@ -4538,10 +4617,4 @@ window.switchMobileView = function(view) {
             scrollToCurrentPlaylistItem();
         }, 150);
     }
-};
-
-// 新增：强制滚动到当前播放列表项目（用于调试）
-window.forceScrollToCurrentPlaylistItem = function() {
-    debugLog("强制滚动到当前播放列表项目");
-    scrollToCurrentPlaylistItem();
 };
