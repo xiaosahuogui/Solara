@@ -537,6 +537,7 @@ const savedCurrentPlaylist = (() => {
 })();
 
 // API配置 - 修复API地址和请求方式
+// API配置 - 修复API地址和请求方式
 const API = {
     baseUrl: "/proxy",
 
@@ -570,83 +571,30 @@ const API = {
     },
 
     search: async (keyword, source = "kuwo", count = 50, page = 1) => {
-    const signature = API.generateSignature();
-    const url = `${API.baseUrl}?types=search&source=${source}&name=${encodeURIComponent(keyword)}&count=${count}&pages=${page}&s=${signature}`;
-
-    try {
-        debugLog(`API请求: ${url}`);
-        const data = await API.fetchJson(url);
-        debugLog(`API响应: ${JSON.stringify(data).substring(0, 200)}...`);
-
-        if (!Array.isArray(data)) {
-            throw new Error("搜索结果格式错误");
-        }
-
-        return data.map(song => ({
-            id: song.id,
-            name: song.name,
-            artist: song.artist,
-            album: song.album,
-            pic_id: song.pic_id,
-            url_id: song.url_id,
-            lyric_id: song.lyric_id,
-            source: song.source,
-        }));
-    } catch (error) {
-        debugLog(`API错误: ${error.message}`);
-        throw error;
-    }
-},
-
-    getRadarPlaylist: async (playlistId = "3778678", options = {}) => {
         const signature = API.generateSignature();
-
-        let limit = 50;
-        let offset = 0;
-
-        if (typeof options === "number") {
-            limit = options;
-        } else if (options && typeof options === "object") {
-            if (Number.isFinite(options.limit)) {
-                limit = options.limit;
-            } else if (Number.isFinite(options.count)) {
-                limit = options.count;
-            }
-            if (Number.isFinite(options.offset)) {
-                offset = options.offset;
-            }
-        }
-
-        limit = Math.max(1, Math.min(200, Math.trunc(limit)) || 50);
-        offset = Math.max(0, Math.trunc(offset) || 0);
-
-        const params = new URLSearchParams({
-            types: "playlist",
-            id: playlistId,
-            limit: String(limit),
-            offset: String(offset),
-            s: signature,
-        });
-        const url = `${API.baseUrl}?${params.toString()}`;
+        const url = `${API.baseUrl}?types=search&source=${source}&name=${encodeURIComponent(keyword)}&count=${count}&pages=${page}&s=${signature}`;
 
         try {
+            debugLog(`API请求: ${url}`);
             const data = await API.fetchJson(url);
-            const tracks = data && data.playlist && Array.isArray(data.playlist.tracks)
-                ? data.playlist.tracks.slice(0, limit)
-                : [];
+            debugLog(`API响应: ${JSON.stringify(data).substring(0, 200)}...`);
 
-            if (tracks.length === 0) throw new Error("No tracks found");
+            if (!Array.isArray(data)) {
+                throw new Error("搜索结果格式错误");
+            }
 
-            return tracks.map(track => ({
-                id: track.id,
-                name: track.name,
-                artist: Array.isArray(track.ar) ? track.ar.map(artist => artist.name).join(" / ") : "",
-                source: "netease",
-                lyric_id: track.id,
-                pic_id: track.al?.pic_str || track.al?.pic || track.al?.picUrl || "",
+            return data.map(song => ({
+                id: song.id,
+                name: song.name,
+                artist: song.artist,
+                album: song.album,
+                pic_id: song.pic_id,
+                url_id: song.url_id,
+                lyric_id: song.lyric_id,
+                source: song.source,
             }));
         } catch (error) {
-            console.error("API request failed:", error);
+            debugLog(`API错误: ${error.message}`);
             throw error;
         }
     },
@@ -4217,8 +4165,6 @@ async function exploreOnlineMusic() {
         if (loader) loader.style.display = "none";
     }
 }
-
-
 
 // 修复：加载歌词
 async function loadLyrics(song) {
