@@ -4278,16 +4278,36 @@ async function exploreOnlineMusic() {
     }
 }
 
-// 修复：加载歌词
+// 替换原来的 loadLyrics 函数
 async function loadLyrics(song) {
+    const tryLyricId = async (lyricId) => {
+        try {
+            const url = API.getLyric({ ...song, lyric_id: lyricId });
+            const data = await API.fetchJson(url);
+            let text = null;
+            if (typeof data === 'string') text = data;
+            else if (data) text = data.lyric || data.lrc || data.content || data.data;
+            return text?.trim() || null;
+        } catch (e) {
+            return null;
+        }
+    };
+
     try {
-        const lyricUrl = API.getLyric(song);
-        debugLog(`获取歌词URL: ${lyricUrl}`);
+        // 优先尝试 lyric_id
+        let lyricText = await tryLyricId(song.lyric_id);
+        // 失败则尝试 song.id
+        if (!lyricText && song.id !== song.lyric_id) {
+            lyricText = await tryLyricId(song.id);
+        }
+        // 还失败则尝试 artist + name 拼接（某些平台支持）
+        if (!lyricText) {
+            const fallbackId = `${song.artist}_${song.name}`.replace(/[^\w]/g, '_');
+            lyricText = await tryLyricId(fallbackId);
+        }
 
-        const lyricData = await API.fetchJson(lyricUrl);
-
-        if (lyricData && lyricData.lyric) {
-            parseLyrics(lyricData.lyric);
+        if (lyricText) {
+            parseLyrics(lyricText);
             dom.lyrics.classList.remove("empty");
             dom.lyrics.dataset.placeholder = "default";
         } else {
@@ -4308,27 +4328,86 @@ async function loadLyrics(song) {
 }
 
 // 修复：解析歌词
+// 修复：解析歌词 - 增强格式兼容性（完整版）
 function parseLyrics(lyricText) {
     const lines = lyricText.split('\n');
     const lyrics = [];
+    let hasValidLyrics = false;
 
     lines.forEach(line => {
-        const match = line.match(/\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/);
-        if (match) {
-            const minutes = parseInt(match[1]);
-            const seconds = parseInt(match[2]);
-            const milliseconds = parseInt(match[3].padEnd(3, '0'));
-            const time = minutes * 60 + seconds + milliseconds / 1000;
-            const text = match[4].trim();
+        line = line.trim();
+        if (!line) return;
 
-            if (text) {
+        // 支持多种时间戳格式
+        const timeFormats = [
+            /\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/,  // [mm:ss.xxx]text
+            /\[(\d{2}):(\d{2}):(\d{2,3})\](.*)/,   // [mm:ss:xxx]text
+            /\[(\d{2}):(\d{2})\](.*)/,              // [mm:ss]text
+            /\[(\d{1,2}):(\d{2})\.(\d{2,3})\](.*)/, // [m:ss.xxx]text
+            /\[(\d{1,2}):(\d{2})\](.*)/             // [m:ss]text
+        ];
+        let match = null;
+        for (const pattern of timeFormats) {
+            match = line.match(pattern);
+            if (match) break;
+        }
+
+        if (match) {
+            let minutes, seconds, milliseconds = 0;
+            if (match[3] !== undefined) {
+                // 格式包含毫秒
+                minutes = parseInt(match[1], 10);
+                seconds = parseInt(match[2], 10);
+                milliseconds = parseInt(match[3].padEnd(3, '0'), 10);
+            } else {
+                // 格式不包含毫秒
+                minutes = parseInt(match[1], 10);
+                seconds = parseInt(match[2], 10);
+            }
+            const time = minutes * 60 + seconds + milliseconds / 1000;
+            const text = match[match.length - 1].trim();
+            if (text && text !== '//' && !text.startsWith('//')) {
                 lyrics.push({ time, text });
+                hasValidLyrics = true;
+            }
+        } else if (line.includes('[') && line.includes(']')) {
+            // 跳过元数据行（如 [ar:xxx], [ti:xxx]）
+            debugLog(`跳过元数据行: ${line}`);
+        } else if (line.trim()) {
+            // 处理无时间戳的纯文本行
+            const lastLyric = lyrics[lyrics.length - 1];
+            if (lastLyric) {
+                // 附加到上一行（避免断句）
+                lastLyric.text += '\n' + line;
+            } else {
+                // 如果是第一行且无时间戳，创建一个 0 秒的条目
+                lyrics.push({ time: 0, text: line });
+                hasValidLyrics = true;
             }
         }
     });
 
-    state.lyricsData = lyrics.sort((a, b) => a.time - b.time);
-    displayLyrics();
+    if (hasValidLyrics) {
+        // 有有效带时间戳歌词：排序并显示
+        state.lyricsData = lyrics.sort((a, b) => a.time - b.time);
+        displayLyrics();
+        debugLog(`解析歌词成功: ${lyrics.length} 行`);
+    } else {
+        // 完全没有有效时间戳：显示原始文本（保留换行）
+        const cleanText = lyricText.trim().replace(/\n\s*\n/g, '\n');
+        if (cleanText) {
+            setLyricsContentHtml(`<div class="lyrics-plain">${cleanText.replace(/\n/g, '<br>')}</div>`);
+            dom.lyrics.classList.remove("empty");
+            dom.lyrics.dataset.placeholder = "default";
+        } else {
+            setLyricsContentHtml("<div>暂无歌词</div>");
+            dom.lyrics.classList.add("empty");
+            dom.lyrics.dataset.placeholder = "message";
+        }
+        state.lyricsData = [];
+        state.currentLyricLine = -1;
+        debugLog("无有效时间戳歌词，显示原始文本");
+    }
 }
 
 function setLyricsContentHtml(html) {
