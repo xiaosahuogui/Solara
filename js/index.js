@@ -2136,7 +2136,7 @@ function setupInteractions() {
         console.error('DOM元素加载不完整，功能可能受限');
         // 继续执行，但功能可能受限
     }
-
+    // 定义 ensureQualityMenuPortal 函数
     function ensureQualityMenuPortal() {
         if (!dom.playerQualityMenu || !document.body || !isMobileView) {
             return;
@@ -2148,115 +2148,21 @@ function setupInteractions() {
         currentParent.removeChild(dom.playerQualityMenu);
         document.body.appendChild(dom.playerQualityMenu);
     }
-
+    // 定义 initializePlaylistEventHandlers 函数
     function initializePlaylistEventHandlers() {
         if (!dom.playlistItems) {
             return;
         }
-
         const activatePlaylistItem = (index) => {
             if (typeof index !== "number" || Number.isNaN(index)) {
                 return;
             }
             playPlaylistSong(index);
         };
-
         const handlePlaylistAction = (event, actionButton) => {
             const index = Number(actionButton.dataset.index);
             if (Number.isNaN(index)) {
                 return;
-            }
-
-            const action = actionButton.dataset.playlistAction;
-            if (action === "remove") {
-                event.preventDefault();
-                event.stopPropagation();
-                removeFromPlaylist(index);
-            } else if (action === "download") {
-                event.preventDefault();
-                event.stopPropagation();
-                showQualityMenu(event, index, "playlist");
-            }
-        };
-
-        const handleClick = (event) => {
-            const actionButton = event.target.closest("[data-playlist-action]");
-            if (actionButton) {
-                handlePlaylistAction(event, actionButton);
-                return;
-            }
-            const item = event.target.closest(".playlist-item");
-            if (!item || !dom.playlistItems.contains(item)) {
-                return;
-            }
-
-            const index = Number(item.dataset.index);
-            if (Number.isNaN(index)) {
-                return;
-            }
-
-            activatePlaylistItem(index);
-        };
-
-        const handleKeydown = (event) => {
-            if (event.key !== "Enter" && event.key !== " ") {
-                return;
-            }
-            if (event.target.closest("[data-playlist-action]")) {
-                return;
-            }
-            const item = event.target.closest(".playlist-item");
-            if (!item || !dom.playlistItems.contains(item)) {
-                return;
-            }
-            const index = Number(item.dataset.index);
-            if (Number.isNaN(index)) {
-                return;
-            }
-            event.preventDefault();
-            activatePlaylistItem(index);
-        };
-
-        dom.playlistItems.addEventListener("click", handleClick);
-        dom.playlistItems.addEventListener("keydown", handleKeydown);
-    }
-
-    // 应用主题
-    function applyTheme(isDark) {
-        if (!state.themeDefaultsCaptured) {
-            captureThemeDefaults();
-        }
-        document.body.classList.toggle("dark-mode", isDark);
-        dom.themeToggleButton.classList.toggle("is-dark", isDark);
-        const label = isDark ? "切换为浅色模式" : "切换为深色模式";
-        dom.themeToggleButton.setAttribute("aria-label", label);
-        dom.themeToggleButton.setAttribute("title", label);
-        applyDynamicGradient();
-    }
-
-    // 初始化主题
-    captureThemeDefaults();
-    const savedTheme = safeGetLocalStorage("theme");
-    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initialIsDark = savedTheme ? savedTheme === "dark" : prefersDark;
-    applyTheme(initialIsDark);
-
-    // 初始化音频设置
-    dom.audioPlayer.volume = state.volume;
-    dom.volumeSlider.value = state.volume;
-    updateVolumeSliderBackground(state.volume);
-    updateVolumeIcon(state.volume);
-
-    // 构建菜单
-    buildSourceMenu();
-    updateSourceLabel();
-    buildQualityMenu();
-    ensureQualityMenuPortal();
-    initializePlaylistEventHandlers();
-    updateQualityLabel();
-    updatePlayPauseButton();
-    dom.currentTimeDisplay.textContent = formatTime(state.currentPlaybackTime);
-    updateProgressBarBackground(0, Number(dom.progressBar.max));
 
     try {
         // 绑定事件监听器
@@ -4402,10 +4308,10 @@ function updateOnlineHighlight() {
 }
 
 // 修复：探索在线音乐 - 添加到统一播放列表
+// 探索雷达函数
 async function exploreOnlineMusic() {
     console.log('探索雷达函数被调用');
     
-    // 检查必要的依赖
     if (!dom.loadOnlineBtn) {
         console.error('探索雷达按钮未找到');
         showNotification("探索雷达功能暂不可用", "error");
@@ -4416,7 +4322,6 @@ async function exploreOnlineMusic() {
     const btnText = btn.querySelector(".btn-text");
     const loader = btn.querySelector(".loader");
 
-    // 检查元素是否存在
     if (!btnText || !loader) {
         console.error('探索雷达按钮内部元素未找到');
         return;
@@ -4428,8 +4333,6 @@ async function exploreOnlineMusic() {
         loader.style.display = "inline-block";
 
         console.log('开始探索雷达搜索...');
-
-        // 清空之前的在线音乐
         state.onlineSongs = [];
 
         // 随机选择一个关键词
@@ -4441,29 +4344,23 @@ async function exploreOnlineMusic() {
         console.log(`搜索到 ${songs.length} 首歌曲`);
 
         if (songs && songs.length > 0) {
-            // 去重逻辑：基于歌曲ID去重
+            // 去重逻辑
             const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
             const uniqueSongs = songs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
 
             console.log(`去重后剩余 ${uniqueSongs.length} 首歌曲`);
 
             if (uniqueSongs.length > 0) {
-                // 将去重后的歌曲添加到播放列表
                 state.playlistSongs = [...state.playlistSongs, ...uniqueSongs];
-                
-                // 更新在线音乐列表
                 state.onlineSongs = uniqueSongs;
 
-                // 如果当前没有在播放，自动播放第一首新添加的歌曲
                 if (!state.currentSong && uniqueSongs.length > 0) {
                     state.currentTrackIndex = state.playlistSongs.length - uniqueSongs.length;
                     state.currentPlaylist = "playlist";
                     await playPlaylistSong(state.currentTrackIndex);
                 }
 
-                // 更新播放列表显示
                 renderPlaylist();
-
                 showNotification(`探索雷达已添加 ${uniqueSongs.length} 首随机歌曲 (关键词: ${randomKeyword})`);
                 console.log(`探索雷达成功添加 ${uniqueSongs.length} 首歌曲`);
             } else {
@@ -4479,6 +4376,82 @@ async function exploreOnlineMusic() {
         btn.disabled = false;
         if (btnText) btnText.style.display = "flex";
         if (loader) loader.style.display = "none";
+    }
+}
+
+// 搜索函数
+async function performSearch(isLiveSearch = false) {
+    const query = dom.searchInput.value.trim();
+    if (!query) {
+        showNotification("请输入搜索关键词", "error");
+        return;
+    }
+
+    if (state.sourceMenuOpen) {
+        closeSourceMenu();
+    }
+
+    const source = normalizeSource(state.searchSource);
+    state.searchSource = source;
+    safeSetLocalStorage("searchSource", source);
+    updateSourceLabel();
+    buildSourceMenu();
+
+    if (!isLiveSearch) {
+        state.searchPage = 1;
+        state.searchKeyword = query;
+        state.searchSource = source;
+        state.searchResults = [];
+        state.hasMoreResults = true;
+        state.renderedSearchCount = 0;
+        resetSelectedSearchResults();
+        const listContainer = dom.searchResultsList || dom.searchResults;
+        if (listContainer) {
+            listContainer.innerHTML = "";
+        }
+        debugLog(`开始新搜索: ${query}, 来源: ${source}`);
+    } else {
+        state.searchKeyword = query;
+        state.searchSource = source;
+    }
+
+    try {
+        dom.searchBtn.disabled = true;
+        dom.searchBtn.innerHTML = '<span class="loader"></span><span>搜索中...</span>';
+
+        showSearchResults();
+        debugLog("已切换到搜索模式");
+
+        // 执行搜索
+        const results = await API.search(query, source, 20, state.searchPage);
+        debugLog(`API返回结果数量: ${results.length}`);
+
+        if (state.searchPage === 1) {
+            state.searchResults = results;
+        } else {
+            state.searchResults = [...state.searchResults, ...results];
+        }
+
+        state.hasMoreResults = results.length === 20;
+
+        displaySearchResults(results, {
+            reset: state.searchPage === 1,
+            totalCount: state.searchResults.length,
+        });
+        debugLog(`搜索完成: 总共显示 ${state.searchResults.length} 个结果`);
+
+        if (state.searchResults.length === 0) {
+            showNotification("未找到相关歌曲", "error");
+        }
+
+    } catch (error) {
+        console.error("搜索失败:", error);
+        showNotification("搜索失败，请稍后重试", "error");
+        hideSearchResults();
+        debugLog(`搜索失败: ${error.message}`);
+    } finally {
+        dom.searchBtn.disabled = false;
+        dom.searchBtn.innerHTML = '<i class="fas fa-search"></i><span>搜索</span>';
     }
 }
 
