@@ -8,17 +8,17 @@ body.mobile-view * {
 html.mobile-view,
 body.mobile-view {
     background:
-        radial-gradient(120% 140% at 50% 0%, #1b1d24 0%, #0d1018 70%, #05070c 100%),
-        radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.1) 0%, transparent 50%),
-        linear-gradient(135deg, rgba(243, 162, 91, 0.03) 0%, transparent 20%, transparent 80%, rgba(243, 109, 109, 0.03) 100%);
+        linear-gradient(135deg, #0f1118 0%, #1a1d25 50%, #0d1018 100%),
+        radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.08) 0%, transparent 50%),
+        linear-gradient(45deg, rgba(243, 162, 91, 0.04) 0%, transparent 30%, transparent 70%, rgba(243, 109, 109, 0.04) 100%);
     color: #f2f5f9;
     height: var(--mobile-vh, 100dvh);
     min-height: var(--mobile-vh, 100dvh);
     overflow: hidden;
     touch-action: pan-y;
     overscroll-behavior: none;
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(15px);
 }
 
 body.mobile-view {
@@ -47,9 +47,9 @@ body.mobile-view .background-stage {
     html.mobile-view,
     body.mobile-view {
         background:
-            radial-gradient(120% 140% at 50% 0%, #1b1d24 0%, #0d1018 70%, #05070c 100%),
-            radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.1) 0%, transparent 50%);
+            linear-gradient(135deg, #0f1118 0%, #1a1d25 50%, #0d1018 100%),
+            radial-gradient(circle at 20% 80%, rgba(243, 162, 91, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(243, 109, 109, 0.08) 0%, transparent 50%);
     }
 
     body.mobile-view {
@@ -91,16 +91,17 @@ body.mobile-view .container {
     width: 100%;
     max-width: 420px;
     background:
-        linear-gradient(180deg, rgba(27, 29, 36, 0.92), rgba(7, 9, 14, 0.95)),
-        linear-gradient(135deg, rgba(243, 162, 91, 0.03) 0%, rgba(243, 109, 109, 0.03) 100%);
-    border-radius: 32px;
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
+        linear-gradient(180deg, rgba(27, 29, 36, 0.85), rgba(13, 16, 24, 0.92));
+    border-radius: 24px;
     padding: clamp(16px, 5vw, 28px);
     padding-top: calc(env(safe-area-inset-top) + clamp(18px, 6vw, 32px));
     padding-bottom: calc(env(safe-area-inset-bottom) + clamp(22px, 7vw, 32px));
     box-shadow:
-        0 32px 90px rgba(0, 0, 0, 0.65),
-        0 0 0 1px rgba(255, 255, 255, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        0 24px 60px rgba(0, 0, 0, 0.4),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
     gap: clamp(12px, 4vw, 24px);
@@ -109,8 +110,8 @@ body.mobile-view .container {
     flex: 1 1 auto;
     min-height: calc(var(--mobile-vh, 100dvh) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     box-sizing: border-box;
-    backdrop-filter: blur(40px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 body.mobile-view .container::after {
@@ -119,10 +120,11 @@ body.mobile-view .container::after {
     inset: 0;
     pointer-events: none;
     background:
-        radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 65%),
-        radial-gradient(circle at 30% 30%, rgba(243, 162, 91, 0.05) 0%, transparent 50%);
-    opacity: 0.6;
-    border-radius: 32px;
+        radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 70%),
+        radial-gradient(circle at 30% 30%, rgba(243, 162, 91, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(243, 109, 109, 0.06) 0%, transparent 50%);
+    opacity: 0.4;
+    border-radius: 24px;
 }
 
 body.mobile-view .header,
@@ -207,12 +209,13 @@ body.mobile-view .mobile-turntable {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: min(78vw, 320px);
-    height: min(78vw, 320px);
+    width: min(72vw, 300px);
+    height: min(72vw, 300px);
     margin: 0 auto;
     aspect-ratio: 1/1;
     min-width: 0;
     min-height: 0;
+    flex-shrink: 0;
 }
 
 body.mobile-view .mobile-turntable__platter {
@@ -220,11 +223,12 @@ body.mobile-view .mobile-turntable__platter {
     height: 100%;
     border-radius: 50%;
     background:
-        radial-gradient(circle at 48% 50%, #1a1d25 0%, #05070c 65%, #000 100%),
-        radial-gradient(circle at 30% 30%, rgba(243, 162, 91, 0.1) 0%, transparent 40%);
+        radial-gradient(circle at 48% 50%, #1a1d25 0%, #0d1018 65%, #05070c 100%),
+        radial-gradient(circle at 30% 30%, rgba(243, 162, 91, 0.08) 0%, transparent 40%);
     box-shadow:
-        0 32px 70px rgba(0, 0, 0, 0.55),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
     position: relative;
     display: flex;
     align-items: center;
@@ -235,6 +239,7 @@ body.mobile-view .mobile-turntable__platter {
     aspect-ratio: 1/1;
     min-width: 0;
     min-height: 0;
+    flex-shrink: 0;
 }
 
 body.mobile-view .mobile-turntable__platter::before {
@@ -260,32 +265,42 @@ body.mobile-view .mobile-close-btn {
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
 body.mobile-view .album-cover img {
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
+    flex-shrink: 0;
+    transform: scale(1.02); /* Prevents edge clipping */
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 body.mobile-view .album-cover {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 58%;
-    height: 58%;
+    width: 56%;
+    height: 56%;
     transform: translate(-50%, -50%);
     border-radius: 50%;
     overflow: hidden;
     box-shadow:
-        inset 0 0 0 3px rgba(0, 0, 0, 0.55),
-        0 18px 38px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.35);
+        inset 0 0 0 2px rgba(0, 0, 0, 0.4),
+        0 16px 32px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.25);
     z-index: 2;
     aspect-ratio: 1/1;
     min-width: 0;
     min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 body.mobile-view .album-cover img {
@@ -295,11 +310,17 @@ body.mobile-view .album-cover img {
     border-radius: 50%;
     aspect-ratio: 1/1;
     display: block;
+    transform: scale(1.02); /* Prevents edge clipping */
 }
 
 body.mobile-view .album-cover .placeholder {
-    font-size: clamp(36px, 12vw, 48px);
-    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(32px, 10vw, 42px);
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 
 body.mobile-view .mobile-inline-lyrics {
@@ -647,22 +668,23 @@ body.mobile-view .mobile-panel {
     transform: translate(-50%, 110%);
     bottom: 0;
     width: min(100%, 420px);
-    background: rgba(13, 16, 24, 0.96);
-    backdrop-filter: blur(28px);
-    border-radius: 28px 28px 0 0;
-    padding: 18px clamp(18px, 6vw, 28px) calc(env(safe-area-inset-bottom) + clamp(22px, 7vw, 32px));
+    background: rgba(18, 21, 30, 0.96);
+    backdrop-filter: blur(24px);
+    border-radius: 24px 24px 0 0;
+    padding: 16px clamp(16px, 5vw, 24px) calc(env(safe-area-inset-bottom) + clamp(20px, 6vw, 28px));
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
     z-index: 400;
     pointer-events: auto;
-    box-shadow: 0 -28px 60px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 -24px 48px rgba(0, 0, 0, 0.5);
     transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
-    height: calc(100dvh - clamp(120px, 34vw, 200px));
-    max-height: calc(100dvh - clamp(120px, 34vw, 200px));
+    height: calc(100dvh - clamp(100px, 30vw, 180px));
+    max-height: calc(100dvh - clamp(100px, 30vw, 180px));
     overflow: hidden;
     overscroll-behavior: contain;
     touch-action: pan-y;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 body.mobile-view.mobile-panel-open .mobile-panel {
