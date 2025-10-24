@@ -174,7 +174,14 @@ function toggleMobileSearch() {
 }
 
 function openMobilePanel(view = "playlist") {
-    return invokeMobileHook("openPanel", view);
+    const result = invokeMobileHook("openPanel", view);
+    // 如果是播放列表视图，添加自动滚动
+    if (view === "playlist") {
+        setTimeout(() => {
+            scrollToCurrentPlaylistItem();
+        }, 300);
+    }
+    return result;
 }
 
 function closeMobilePanel() {
@@ -528,7 +535,7 @@ const API = {
         }
     },
 
-    search: async (keyword, source = "netease", count = 50, page = 1) => {
+    search: async (keyword, source = "kuwo", count = 50, page = 1) => {
         const signature = API.generateSignature();
         const url = `${API.baseUrl}?types=search&source=${source}&name=${encodeURIComponent(keyword)}&count=${count}&pages=${page}&s=${signature}`;
 
@@ -2344,8 +2351,16 @@ function setupInteractions() {
         dom.showPlaylistBtn.addEventListener("click", () => {
             if (isMobileView) {
                 openMobilePanel("playlist");
+                // 移动端延迟滚动，等待面板动画完成
+                setTimeout(() => {
+                    scrollToCurrentPlaylistItem();
+                }, 300);
             } else {
                 switchMobileView("playlist");
+                // 桌面端立即滚动
+                setTimeout(() => {
+                    scrollToCurrentPlaylistItem();
+                }, 100);
             }
         });
     }
@@ -2651,7 +2666,7 @@ async function performSearch(isLiveSearch = false) {
         debugLog("已切换到搜索模式");
 
         // 执行搜索
-        const results = await API.search(query, source, 20, state.searchPage);
+        const results = await API.search(query, source, 50, state.searchPage);
         debugLog(`API返回结果数量: ${results.length}`);
 
         if (state.searchPage === 1) {
@@ -2660,7 +2675,7 @@ async function performSearch(isLiveSearch = false) {
             state.searchResults = [...state.searchResults, ...results];
         }
 
-        state.hasMoreResults = results.length === 20;
+        state.hasMoreResults = results.length === 50;
 
         // 显示搜索结果
         displaySearchResults(results, {
@@ -2709,11 +2724,11 @@ async function loadMoreResults() {
         const source = normalizeSource(state.searchSource);
         state.searchSource = source;
         safeSetLocalStorage("searchSource", source);
-        const results = await API.search(state.searchKeyword, source, 20, state.searchPage);
+        const results = await API.search(state.searchKeyword, source, 50, state.searchPage);
 
         if (results.length > 0) {
             state.searchResults = [...state.searchResults, ...results];
-            state.hasMoreResults = results.length === 20;
+            state.hasMoreResults = results.length === 50;
             displaySearchResults(results, {
                 totalCount: state.searchResults.length,
             });
@@ -3554,6 +3569,13 @@ function renderPlaylist() {
     updatePlaylistHighlight();
     updateMobileClearPlaylistVisibility();
     updatePlaylistActionStates();
+    
+    // 如果当前有正在播放的歌曲，自动滚动到该歌曲
+    if (state.currentPlaylist === "playlist" && state.currentTrackIndex >= 0) {
+        setTimeout(() => {
+            scrollToCurrentPlaylistItem();
+        }, 100);
+    }
 }
 
 // 新增：从播放列表移除歌曲
@@ -3683,6 +3705,46 @@ async function playPlaylistSong(index) {
         console.error("播放失败:", error);
         showNotification("播放失败，请稍后重试", "error");
     }
+}
+
+// 新增：滚动到当前播放的播放列表项目
+function scrollToCurrentPlaylistItem() {
+    if (!dom.playlistItems || state.currentPlaylist !== "playlist" || state.currentTrackIndex < 0) {
+        return;
+    }
+    
+    const currentItem = dom.playlistItems.querySelector(`.playlist-item[data-index="${state.currentTrackIndex}"]`);
+    if (!currentItem) {
+        return;
+    }
+    
+    const container = dom.playlistItems;
+    const containerHeight = container.clientHeight;
+    const itemRect = currentItem.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    // 计算元素在容器内部的可视位置
+    const itemOffsetTop = itemRect.top - containerRect.top + container.scrollTop;
+    const itemHeight = itemRect.height;
+    
+    // 目标滚动位置：让当前歌曲的中心与容器中心对齐
+    const targetScrollTop = itemOffsetTop - (containerHeight / 2) + (itemHeight / 2);
+    
+    const maxScrollTop = container.scrollHeight - containerHeight;
+    const finalScrollTop = Math.max(0, Math.min(targetScrollTop, maxScrollTop));
+    
+    if (Math.abs(container.scrollTop - finalScrollTop) > 1) {
+        if (typeof container.scrollTo === "function") {
+            container.scrollTo({
+                top: finalScrollTop,
+                behavior: 'smooth'
+            });
+        } else {
+            container.scrollTop = finalScrollTop;
+        }
+    }
+    
+    debugLog(`播放列表滚动: 当前歌曲索引=${state.currentTrackIndex}, 目标滚动位置=${finalScrollTop}`);
 }
 
 // 新增：更新播放列表高亮
