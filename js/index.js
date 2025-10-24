@@ -4763,14 +4763,13 @@ function setupInteractions() {
 					}
 
 					// 修改通知函数以支持持续时间参数
-					function showNotification(message, type = "success", duration = 3000) {
-						const notification = dom.notification;
-						notification.textContent = message;
-						notification.className = `notification ${type}`;
-						notification.classList.add("show");
-
-						setTimeout(() => {
-							notification.classList.remove("show");
-						}, duration);
-					}
+				function showNotification(message, type = "success", duration = 3000) {
+				    const notification = dom.notification;
+				    notification.textContent = message;
+				    notification.className = `notification ${type}`;
+				    notification.classList.add("show");
+				
+				    setTimeout(() => {
+				        notification.classList.remove("show");
+				    }, duration);
 				}
