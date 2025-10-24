@@ -1171,3 +1171,133 @@ body.mobile-view .album-cover img {
     object-fit: cover !important;
 }
 /* === 专辑封面彻底正圆修复 END === */
+
+/* === v3 视觉优化与功能增强补丁 START === */
+
+/* ----------- 1. 专辑封面彻底正圆修复 ----------- */
+body.mobile-view .cover-area {
+    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+body.mobile-view .mobile-turntable {
+    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: min(72vw, 300px) !important;
+    height: min(72vw, 300px) !important;
+    aspect-ratio: 1/1 !important;
+    flex: none !important;
+}
+
+body.mobile-view .mobile-turntable__platter {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    flex: none !important;
+    aspect-ratio: 1/1 !important;
+}
+
+body.mobile-view .album-cover {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 56% !important;
+    height: 56% !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1/1 !important;
+    overflow: hidden !important;
+    z-index: 5 !important;
+}
+
+body.mobile-view .album-cover img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* ----------- 2. 歌词显示改为悬浮层，不再顶起封面 ----------- */
+body.mobile-view .mobile-inline-lyrics {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(78vw, 320px) !important;
+    height: min(78vw, 320px) !important;
+    border-radius: 26px !important;
+    background: rgba(12, 14, 20, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+    display: none !important;
+    z-index: 10 !important;
+}
+
+body.mobile-view.mobile-inline-lyrics-open .mobile-inline-lyrics {
+    display: flex !important;
+}
+
+body.mobile-view.mobile-inline-lyrics-open .mobile-turntable {
+    opacity: 0.15 !important;
+    pointer-events: none !important;
+}
+
+/* ----------- 3. 背景优化：去掉异形渐变，改为干净玻璃风 ----------- */
+html.mobile-view,
+body.mobile-view {
+    background: linear-gradient(145deg, #101217 0%, #1a1d25 100%) !important;
+}
+
+body.mobile-view .container {
+    background: rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    border-radius: 24px !important;
+}
+
+/* ----------- 4. 播放列表视觉增强：吸附 + 居中 + 高亮 ----------- */
+body.mobile-view .playlist-scroll {
+    scroll-snap-type: y mandatory !important;
+    scroll-behavior: smooth !important;
+    overflow-y: auto !important;
+}
+
+body.mobile-view .playlist-item {
+    scroll-snap-align: center !important;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+body.mobile-view .playlist-item.current {
+    background: rgba(243, 162, 91, 0.3) !important;
+    color: #fff !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 30px rgba(243, 162, 91, 0.35) !important;
+    border: 1px solid rgba(243, 162, 91, 0.45) !important;
+}
+
+/* ----------- 5. 调整控制按钮更协调 ----------- */
+body.mobile-view .transport-controls {
+    margin-top: auto !important;
+    padding-top: 10px !important;
+}
+
+body.mobile-view .transport-button {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+body.mobile-view .transport-button--play {
+    background: linear-gradient(135deg, #f36d6d, #f3a25b) !important;
+    box-shadow: 0 12px 30px rgba(243, 117, 109, 0.45) !important;
+    color: #1a1b1f !important;
+}
+
+/* === v3 视觉优化与功能增强补丁 END === */
