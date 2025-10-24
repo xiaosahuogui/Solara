@@ -1068,87 +1068,31 @@ body.mobile-view .debug-info {
     display: none;
 }
 
-/* === 修正与优化补丁 START === */
-
-/* 修复专辑封面比例为正圆 */
-body.mobile-view .mobile-turntable,
-body.mobile-view .mobile-turntable__platter,
-body.mobile-view .album-cover,
-body.mobile-view .album-cover img {
-    width: min(72vw, 300px) !important;
-    height: min(72vw, 300px) !important;
-    aspect-ratio: 1 / 1 !important;
-}
-
-/* 去除厚重的圆角黑色容器背景 */
-body.mobile-view .container {
-    background: rgba(20, 20, 25, 0.25) !important;
-    border-radius: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
-    backdrop-filter: blur(20px) !important;
-    padding: clamp(16px, 5vw, 28px);
-}
-
-body.mobile-view .container::after {
-    display: none !important;
-}
-
-/* 调整其他按钮背景透明度，统一玻璃风格 */
-body.mobile-view .transport-button,
-body.mobile-view .mobile-toolbar__button,
-body.mobile-view .mobile-panel-action-btn,
-body.mobile-view .mobile-close-btn {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    backdrop-filter: blur(10px);
-}
-
-/* 高亮播放按钮 */
-body.mobile-view .transport-button--play {
-    background: linear-gradient(135deg, #f36d6d 0%, #f3a25b 100%) !important;
-    color: #1f1b1d !important;
-}
-
-/* 当前播放歌曲自动对齐时的视觉提示 */
-body.mobile-view .playlist-items .playlist-item.current {
-    background: rgba(243, 162, 91, 0.25) !important;
-    color: #ffffff !important;
-    scroll-margin: 60px !important;
-}
-
-/* 让播放列表滚动区更顺滑 */
-body.mobile-view .playlist-scroll {
-    scroll-behavior: smooth;
-}
-
-/* === 修正与优化补丁 END === */
-
 /* === 专辑封面彻底正圆修复 START === */
 body.mobile-view .cover-area {
-    display: grid !important;
-    place-items: center !important;
-    align-content: center !important;
+    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 body.mobile-view .mobile-turntable {
-    display: grid !important;
-    place-items: center !important;
-    flex: none !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: min(72vw, 300px) !important;
-    height: min(72vw, 300px) !important;
-    aspect-ratio: 1 / 1 !important;
+    position: relative !important;
+    width: min(68vw, 280px) !important;
+    height: min(68vw, 280px) !important;
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0;
+    margin: 0 auto !important;
 }
 
 body.mobile-view .mobile-turntable__platter {
     width: 100% !important;
     height: 100% !important;
-    aspect-ratio: 1 / 1 !important;
     border-radius: 50% !important;
-    overflow: hidden !important;
-    flex: none !important;
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0;
 }
 
 body.mobile-view .album-cover {
@@ -1156,164 +1100,230 @@ body.mobile-view .album-cover {
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 56% !important;
-    height: 56% !important;
+    width: 54% !important;
+    height: 54% !important;
     border-radius: 50% !important;
-    aspect-ratio: 1 / 1 !important;
+    aspect-ratio: 1/1 !important;
     overflow: hidden !important;
+    z-index: 5;
 }
 
 body.mobile-view .album-cover img {
-    display: block !important;
     width: 100% !important;
     height: 100% !important;
     border-radius: 50% !important;
     object-fit: cover !important;
+    display: block !important;
+    transform: none !important;
 }
 /* === 专辑封面彻底正圆修复 END === */
 
-/* === v3 视觉优化与功能增强补丁 START === */
-
-/* ----------- 1. 专辑封面彻底正圆修复 ----------- */
-body.mobile-view .cover-area {
-    position: relative !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+/* === 搜索结果页面美化 START === */
+body.mobile-view .search-area {
+    padding: calc(env(safe-area-inset-top) + 24px) clamp(20px, 6vw, 32px) calc(env(safe-area-inset-bottom) + 28px) !important;
+    background: rgba(8, 10, 16, 0.98) !important;
+    backdrop-filter: blur(30px) !important;
 }
 
-body.mobile-view .mobile-turntable {
-    position: relative !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: min(72vw, 300px) !important;
-    height: min(72vw, 300px) !important;
-    aspect-ratio: 1/1 !important;
-    flex: none !important;
+body.mobile-view .search-area .search-container,
+body.mobile-view .search-area .search-results-toolbar,
+body.mobile-view .search-area .search-results-list {
+    width: min(100%, 400px) !important;
+    max-width: 400px !important;
+    align-self: center;
 }
 
-body.mobile-view .mobile-turntable__platter {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-    flex: none !important;
-    aspect-ratio: 1/1 !important;
+body.mobile-view .search-container {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 20px !important;
+    padding: 20px !important;
+    gap: 16px !important;
+    backdrop-filter: blur(15px) !important;
 }
 
-body.mobile-view .album-cover {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: 56% !important;
-    height: 56% !important;
-    border-radius: 50% !important;
-    aspect-ratio: 1/1 !important;
-    overflow: hidden !important;
-    z-index: 5 !important;
+body.mobile-view .search-input {
+    font-size: 1rem !important;
+    padding: 14px 18px !important;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-body.mobile-view .album-cover img {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 50% !important;
-    object-fit: cover !important;
-    display: block !important;
+body.mobile-view .search-input:focus {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(243, 162, 91, 0.6) !important;
+    box-shadow: 0 0 0 2px rgba(243, 162, 91, 0.2) !important;
 }
 
-/* ----------- 2. 歌词显示改为悬浮层，不再顶起封面 ----------- */
-body.mobile-view .mobile-inline-lyrics {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: min(78vw, 320px) !important;
-    height: min(78vw, 320px) !important;
-    border-radius: 26px !important;
-    background: rgba(12, 14, 20, 0.8) !important;
-    backdrop-filter: blur(20px) !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
-    display: none !important;
-    z-index: 10 !important;
+body.mobile-view .source-select-btn,
+body.mobile-view .search-btn {
+    padding: 14px 20px !important;
+    border-radius: 16px !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
 }
 
-body.mobile-view.mobile-inline-lyrics-open .mobile-inline-lyrics {
-    display: flex !important;
+body.mobile-view .search-btn {
+    background: linear-gradient(135deg, rgba(243, 109, 109, 0.9), rgba(243, 162, 91, 0.9)) !important;
+    color: #1b1d24 !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
 }
 
-body.mobile-view.mobile-inline-lyrics-open .mobile-turntable {
-    opacity: 0.15 !important;
-    pointer-events: none !important;
+body.mobile-view .search-btn:hover,
+body.mobile-view .search-btn:focus-visible {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 28px rgba(243, 162, 91, 0.4) !important;
 }
 
-/* ----------- 3. 背景优化：去掉异形渐变，改为干净玻璃风 ----------- */
-html.mobile-view,
-body.mobile-view {
-    background: linear-gradient(145deg, #101217 0%, #1a1d25 100%) !important;
-}
-
-body.mobile-view .container {
-    background: rgba(255, 255, 255, 0.06) !important;
-    backdrop-filter: blur(24px) !important;
+body.mobile-view .search-results-list .playlist-item {
+    padding: 16px 20px !important;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    margin-bottom: 8px !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-    border-radius: 24px !important;
-}
-
-/* ----------- 4. 播放列表视觉增强：居中 + 高亮 + 自动滚动 ----------- */
-body.mobile-view .playlist-scroll {
-    scroll-behavior: smooth !important;
-    overflow-y: auto !important;
-    position: relative !important;
-}
-
-body.mobile-view .playlist-item {
-    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease !important;
-    scroll-margin: 60px !important; /* 确保滚动时元素可见 */
-}
-
-body.mobile-view .playlist-item.current {
-    background: rgba(243, 162, 91, 0.3) !important;
-    color: #fff !important;
-    transform: scale(1.02) !important;
-    box-shadow: 0 0 20px rgba(243, 162, 91, 0.35) !important;
-    border: 1px solid rgba(243, 162, 91, 0.45) !important;
-    position: relative !important;
-    z-index: 1 !important;
-}
-
-/* 确保播放列表容器正确显示 */
-body.mobile-view .playlist.active {
+    transition: all 0.3s ease !important;
     display: flex !important;
     flex-direction: column !important;
-    height: 100% !important;
+    gap: 4px !important;
+    min-height: auto !important;
+    white-space: normal !important;
 }
 
-body.mobile-view .playlist-scroll {
-    flex: 1 !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+body.mobile-view .search-results-list .playlist-item:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* ----------- 5. 调整控制按钮更协调 ----------- */
+body.mobile-view .search-results-list .playlist-item .playlist-item-title {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+}
+
+body.mobile-view .search-results-list .playlist-item .playlist-item-artist {
+    font-size: 0.9rem !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    line-height: 1.3 !important;
+    word-break: break-word !important;
+}
+
+body.mobile-view .play-all-btn {
+    margin-bottom: 16px !important;
+    padding: 16px 24px !important;
+    border-radius: 18px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    background: linear-gradient(135deg, rgba(243, 109, 109, 0.2), rgba(243, 162, 91, 0.2)) !important;
+    border: 1px solid rgba(243, 162, 91, 0.5) !important;
+    box-shadow: 0 10px 30px rgba(243, 162, 91, 0.25) !important;
+}
+
+body.mobile-view .play-all-btn:hover,
+body.mobile-view .play-all-btn:focus-visible {
+    background: linear-gradient(135deg, rgba(243, 109, 109, 0.3), rgba(243, 162, 91, 0.3)) !important;
+    border-color: rgba(243, 162, 91, 0.7) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 15px 35px rgba(243, 162, 91, 0.35) !important;
+}
+/* === 搜索结果页面美化 END === */
+
+/* === 整体视觉优化 START === */
+body.mobile-view .container {
+    background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        linear-gradient(180deg, rgba(27, 29, 36, 0.9), rgba(13, 16, 24, 0.95)) !important;
+    backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.35),
+        0 6px 20px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+body.mobile-view .current-song-info {
+    gap: 8px !important;
+    margin-top: 8px !important;
+}
+
+body.mobile-view .current-song-title {
+    font-size: clamp(1.1rem, 5.5vw, 1.4rem) !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    line-height: 1.3 !important;
+}
+
+body.mobile-view .current-song-artist {
+    font-size: 1rem !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    line-height: 1.2 !important;
+}
+
+body.mobile-view .progress-container {
+    margin-top: 12px !important;
+}
+
+body.mobile-view .progress-container input[type="range"] {
+    height: 5px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(to right,
+        rgba(243, 162, 91, 0.95) 0%,
+        rgba(243, 162, 91, 0.95) var(--progress, 0%),
+        rgba(255, 255, 255, 0.2) var(--progress, 0%),
+        rgba(255, 255, 255, 0.2) 100%) !important;
+}
+
+body.mobile-view .progress-container input[type="range"]::-webkit-slider-thumb {
+    width: 18px !important;
+    height: 18px !important;
+    background: #f3a25b !important;
+    border: 2px solid rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 2px 8px rgba(243, 162, 91, 0.5) !important;
+}
+
 body.mobile-view .transport-controls {
-    margin-top: auto !important;
-    padding-top: 10px !important;
+    margin-top: 20px !important;
+    gap: clamp(16px, 6vw, 22px) !important;
 }
 
 body.mobile-view .transport-button {
+    width: clamp(48px, 15vw, 56px) !important;
+    height: clamp(48px, 15vw, 56px) !important;
     background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(12px) !important;
+    transition: all 0.3s ease !important;
 }
 
 body.mobile-view .transport-button--play {
-    background: linear-gradient(135deg, #f36d6d, #f3a25b) !important;
-    box-shadow: 0 12px 30px rgba(243, 117, 109, 0.45) !important;
-    color: #1a1b1f !important;
+    width: clamp(64px, 20vw, 74px) !important;
+    height: clamp(64px, 20vw, 74px) !important;
+    background: linear-gradient(135deg, #f36d6d 0%, #f3a25b 100%) !important;
+    box-shadow: 0 16px 40px rgba(243, 117, 109, 0.5) !important;
 }
 
-/* === v3 视觉优化与功能增强补丁 END === */
+body.mobile-view .transport-button--play:hover,
+body.mobile-view .transport-button--play:focus-visible {
+    transform: scale(1.05) !important;
+    box-shadow: 0 20px 45px rgba(243, 117, 109, 0.6) !important;
+}
+/* === 整体视觉优化 END === */
+
+/* === 播放列表自动定位保持功能 START === */
+body.mobile-view .playlist-scroll {
+    scroll-behavior: smooth !important;
+    scroll-padding: 80px 0 !important;
+}
+
+body.mobile-view .playlist-items .playlist-item.current {
+    scroll-margin: 80px !important;
+    background: rgba(243, 162, 91, 0.25) !important;
+    border: 1px solid rgba(243, 162, 91, 0.4) !important;
+    position: relative !important;
+}
+/* === 播放列表自动定位保持功能 END === */
