@@ -1,3 +1,20 @@
+// 在文件最开头添加
+console.log('Solara播放器初始化开始...');
+
+// 检查关键函数是否存在
+const requiredFunctions = [
+    'exploreOnlineMusic', 'togglePlayPause', 'performSearch', 
+    'togglePlayerQualityMenu', 'togglePlayMode'
+];
+
+requiredFunctions.forEach(funcName => {
+    if (typeof window[funcName] !== 'function') {
+        console.warn(`函数 ${funcName} 未定义`);
+    } else {
+        console.log(`函数 ${funcName} 已加载`);
+    }
+});
+
 const dom = {
     container: document.getElementById("mainContainer"),
     backgroundStage: document.getElementById("backgroundStage"),
@@ -60,6 +77,30 @@ const dom = {
     mobileQueueToggle: document.getElementById("mobileQueueToggle"),
     searchArea: document.getElementById("searchArea"),
 };
+
+// 在 dom 对象定义后添加
+function checkDOMElements() {
+    const requiredElements = [
+        'loadOnlineBtn', 'playPauseBtn', 'searchBtn', 'qualityToggle', 
+        'mobileExploreButton', 'searchInput'
+    ];
+    
+    const missingElements = [];
+    
+    requiredElements.forEach(id => {
+        if (!dom[id] || !document.getElementById(id)) {
+            missingElements.push(id);
+        }
+    });
+    
+    if (missingElements.length > 0) {
+        console.error('缺少必要的DOM元素:', missingElements);
+        return false;
+    }
+    
+    return true;
+}
+
 
 window.SolaraDom = dom;
 
@@ -2140,6 +2181,11 @@ window.addEventListener("load", setupInteractions);
 dom.audioPlayer.addEventListener("ended", autoPlayNext);
 
 function setupInteractions() {
+
+    // 添加DOM检查
+    if (!checkDOMElements()) {
+        console.error('DOM元素加载不完整，功能可能受限');
+        
     function ensureQualityMenuPortal() {
         if (!dom.playerQualityMenu || !document.body || !isMobileView) {
             return;
@@ -2222,6 +2268,51 @@ function setupInteractions() {
 
         dom.playlistItems.addEventListener("click", handleClick);
         dom.playlistItems.addEventListener("keydown", handleKeydown);
+    }
+                // 探索雷达按钮
+        if (dom.loadOnlineBtn) {
+            dom.loadOnlineBtn.addEventListener("click", exploreOnlineMusic);
+        }
+        if (dom.mobileExploreButton) {
+            dom.mobileExploreButton.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                closeAllMobileOverlays();
+                exploreOnlineMusic();
+            });
+        }
+        // 音质切换
+        if (dom.qualityToggle) {
+            dom.qualityToggle.addEventListener("click", togglePlayerQualityMenu);
+        }
+        if (dom.mobileQualityToggle) {
+            dom.mobileQualityToggle.addEventListener("click", togglePlayerQualityMenu);
+        }
+        // 播放模式
+        if (dom.playModeBtn) {
+            updatePlayModeUI();
+            dom.playModeBtn.addEventListener("click", togglePlayMode);
+        }
+        console.log('事件监听器绑定完成');
+    } catch (error) {
+        console.error('事件监听器绑定失败:', error);
+        // 在 setupInteractions 函数末尾添加
+console.log('Solara播放器初始化完成');
+
+// 测试按钮功能
+setTimeout(() => {
+    console.log('=== 功能测试 ===');
+    console.log('探索雷达按钮:', dom.loadOnlineBtn ? '存在' : '不存在');
+    console.log('播放/暂停按钮:', dom.playPauseBtn ? '存在' : '不存在');
+    console.log('搜索按钮:', dom.searchBtn ? '存在' : '不存在');
+    console.log('音质切换按钮:', dom.qualityToggle ? '存在' : '不存在');
+    
+    // 测试关键函数
+    console.log('探索雷达函数:', typeof exploreOnlineMusic);
+    console.log('播放/暂停函数:', typeof togglePlayPause);
+    console.log('搜索函数:', typeof performSearch);
+}, 1000);
+
     }
 
     function applyTheme(isDark) {
@@ -2491,7 +2582,7 @@ function setupInteractions() {
 
     updatePlaylistActionStates();
 
-    // 在 setupInteractions 函数末尾的播放列表恢复逻辑后添加：
+    // 在 setupInteractions 函数末尾的播放列表恢复逻辑
 if (state.playlistSongs.length > 0) {
     let restoredIndex = state.currentTrackIndex;
     if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
@@ -2515,9 +2606,14 @@ if (state.playlistSongs.length > 0) {
     }
 
     savePlayerState();
+} else {
+    dom.playlist.classList.add("empty");
+    if (dom.playlistItems) {
+        dom.playlistItems.innerHTML = "";
+    }
+    updateMobileClearPlaylistVisibility();
 }
-
-
+    
         savePlayerState();
     } else {
         dom.playlist.classList.add("empty");
@@ -2614,11 +2710,24 @@ function updateCurrentSongInfo(song, options = {}) {
 
 // 搜索功能 - 修复搜索下拉框显示问题
 async function performSearch(isLiveSearch = false) {
+    console.log('搜索功能被调用');
+    
+    if (!dom.searchInput) {
+        console.error('搜索输入框未找到');
+        return;
+    }
+    
     const query = dom.searchInput.value.trim();
     if (!query) {
         showNotification("请输入搜索关键词", "error");
         return;
     }
+
+    console.log(`搜索关键词: ${query}`);
+
+    // 其他搜索代码保持不变，但添加更多调试信息...
+}
+
 
     if (state.sourceMenuOpen) {
         closeSourceMenu();
@@ -4028,28 +4137,49 @@ function updateOnlineHighlight() {
 
 // 修复：探索在线音乐 - 添加到统一播放列表
 async function exploreOnlineMusic() {
+    console.log('探索雷达函数被调用');
+    
+    // 检查必要的依赖
+    if (!dom.loadOnlineBtn) {
+        console.error('探索雷达按钮未找到');
+        showNotification("探索雷达功能暂不可用", "error");
+        return;
+    }
+    
     const btn = dom.loadOnlineBtn;
     const btnText = btn.querySelector(".btn-text");
     const loader = btn.querySelector(".loader");
+
+    // 检查元素是否存在
+    if (!btnText || !loader) {
+        console.error('探索雷达按钮内部元素未找到');
+        return;
+    }
 
     try {
         btn.disabled = true;
         btnText.style.display = "none";
         loader.style.display = "inline-block";
 
+        console.log('开始探索雷达搜索...');
+
         // 清空之前的在线音乐
         state.onlineSongs = [];
 
         // 随机选择一个关键词
         const randomKeyword = RANDOM_KEYWORDS[Math.floor(Math.random() * RANDOM_KEYWORDS.length)];
+        console.log(`使用关键词: ${randomKeyword}`);
         
         // 使用酷我音乐源搜索随机关键词
         const songs = await API.search(randomKeyword, 'kuwo', 20, 1);
+        console.log(`搜索到 ${songs.length} 首歌曲`);
 
-        if (songs.length > 0) {
+        if (songs && songs.length > 0) {
             // 去重逻辑：基于歌曲ID去重
             const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
             const uniqueSongs = songs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
+
+            console.log(`去重后剩余 ${uniqueSongs.length} 首歌曲`);
 
             if (uniqueSongs.length > 0) {
                 // 将去重后的歌曲添加到播放列表
@@ -4069,7 +4199,7 @@ async function exploreOnlineMusic() {
                 renderPlaylist();
 
                 showNotification(`探索雷达已添加 ${uniqueSongs.length} 首随机歌曲 (关键词: ${randomKeyword})`);
-                debugLog(`探索雷达搜索成功: 关键词 "${randomKeyword}", 找到 ${songs.length} 首, 去重后 ${uniqueSongs.length} 首`);
+                console.log(`探索雷达成功添加 ${uniqueSongs.length} 首歌曲`);
             } else {
                 showNotification("所有歌曲都已存在于播放列表中", "info");
             }
@@ -4081,10 +4211,11 @@ async function exploreOnlineMusic() {
         showNotification("探索失败，请稍后重试", "error");
     } finally {
         btn.disabled = false;
-        btnText.style.display = "flex";
-        loader.style.display = "none";
+        if (btnText) btnText.style.display = "flex";
+        if (loader) loader.style.display = "none";
     }
 }
+
 
 
 // 修复：加载歌词
