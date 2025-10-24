@@ -416,6 +416,15 @@ const SOURCE_OPTIONS = [
     { value: "joox", label: "JOOX音乐" }
 ];
 
+// 随机关键词列表
+const RANDOM_KEYWORDS = [
+    '流行', '摇滚', '民谣', '电子', '爵士', '古典', '说唱', 'R&B', '嘻哈', '蓝调',
+    '轻音乐', '纯音乐', '背景音乐', '钢琴曲', '吉他', '小提琴', '古风', '中国风',
+    '治愈', '放松', '冥想', '睡眠', '工作', '学习', '运动', '健身', '旅行', '开车',
+    '清晨', '夜晚', '雨天', '夏天', '冬天', '春天', '秋天', '爱情', '友情', '亲情',
+    '思念', '回忆', '梦想', '希望', '自由', '孤独', '快乐', '悲伤', '安静', '热闹'
+];
+
 function normalizeSource(value) {
     const allowed = SOURCE_OPTIONS.map(option => option.value);
     return allowed.includes(value) ? value : SOURCE_OPTIONS[0].value;
@@ -2482,24 +2491,32 @@ function setupInteractions() {
 
     updatePlaylistActionStates();
 
-    if (state.playlistSongs.length > 0) {
-        let restoredIndex = state.currentTrackIndex;
-        if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
-            restoredIndex = 0;
-        }
+    // 在 setupInteractions 函数末尾的播放列表恢复逻辑后添加：
+if (state.playlistSongs.length > 0) {
+    let restoredIndex = state.currentTrackIndex;
+    if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
+        restoredIndex = 0;
+    }
 
-        state.currentTrackIndex = restoredIndex;
-        state.currentPlaylist = "playlist";
-        renderPlaylist();
+    state.currentTrackIndex = restoredIndex;
+    state.currentPlaylist = "playlist";
+    renderPlaylist();
 
-        const restoredSong = state.playlistSongs[restoredIndex];
-        if (restoredSong) {
-            state.currentSong = restoredSong;
-            updatePlaylistHighlight();
-            updateCurrentSongInfo(restoredSong).catch(error => {
-                console.error("恢复歌曲信息失败:", error);
-            });
-        }
+    const restoredSong = state.playlistSongs[restoredIndex];
+    if (restoredSong) {
+        state.currentSong = restoredSong;
+        updatePlaylistHighlight();
+        updateCurrentSongInfo(restoredSong).catch(error => {
+            console.error("恢复歌曲信息失败:", error);
+        });
+        
+        // 新增：页面加载时自动定位到当前歌曲
+        autoScrollToCurrentSong();
+    }
+
+    savePlayerState();
+}
+
 
         savePlayerState();
     } else {
@@ -3440,6 +3457,29 @@ function handleImportPlaylistChange(event) {
     reader.readAsText(file, "utf-8");
 }
 
+// 自动滚动到当前播放的歌曲
+function autoScrollToCurrentSong() {
+    if (state.currentPlaylist === "playlist" && state.currentTrackIndex >= 0) {
+        // 使用 setTimeout 确保 DOM 已经更新
+        setTimeout(() => {
+            const currentItem = dom.playlistItems.querySelector(`.playlist-item[data-index="${state.currentTrackIndex}"]`);
+            if (currentItem) {
+                // 滚动到当前歌曲位置
+                currentItem.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+                
+                // 添加高亮效果
+                currentItem.classList.add('current');
+                
+                debugLog(`自动定位到播放列表第 ${state.currentTrackIndex + 1} 首歌曲`);
+            }
+        }, 100);
+    }
+}
+
 // 新增：渲染统一播放列表
 function renderPlaylist() {
     if (!dom.playlistItems) return;
@@ -3472,6 +3512,9 @@ function renderPlaylist() {
     updatePlaylistHighlight();
     updateMobileClearPlaylistVisibility();
     updatePlaylistActionStates();
+
+    // 新增：自动滚动到当前播放的歌曲
+    autoScrollToCurrentSong();
 }
 
 // 新增：从播放列表移除歌曲
@@ -3594,6 +3637,10 @@ async function playPlaylistSong(index) {
     try {
         await playSong(song);
         updatePlaylistHighlight();
+        
+        // 新增：播放时自动定位到当前歌曲
+        autoScrollToCurrentSong();
+        
         if (isMobileView) {
             closeMobilePanel();
         }
@@ -3602,6 +3649,7 @@ async function playPlaylistSong(index) {
         showNotification("播放失败，请稍后重试", "error");
     }
 }
+
 
 // 新增：更新播放列表高亮
 function updatePlaylistHighlight() {
@@ -3814,12 +3862,60 @@ function scheduleDeferredSongAssets(song, playPromise) {
     }
 }
 
+// 静默加载新的探索雷达歌曲
+async function silentlyLoadMoreRadarSongs() {
+    if (state.playlistSongs.length === 0) return;
+
+    // 计算剩余歌曲数量（从当前播放位置到列表末尾）
+    const remainingSongs = state.playlistSongs.length - state.currentTrackIndex - 1;
+    
+    // 如果剩余歌曲少于5首，静默加载新歌
+    if (remainingSongs <= 5) {
+        try {
+            debugLog("探索雷达: 剩余歌曲不足，静默加载新歌...");
+            
+            // 随机选择关键词
+            const randomKeyword = RANDOM_KEYWORDS[Math.floor(Math.random() * RANDOM_KEYWORDS.length)];
+            
+            // 使用酷我音乐源搜索
+            const newSongs = await API.search(randomKeyword, 'kuwo', 10, 1);
+            
+            if (newSongs.length > 0) {
+                // 去重逻辑
+                const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
+                const uniqueNewSongs = newSongs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
+                
+                if (uniqueNewSongs.length > 0) {
+                    // 静默添加到播放列表末尾
+                    state.playlistSongs = [...state.playlistSongs, ...uniqueNewSongs];
+                    
+                    // 更新播放列表显示，但不强制滚动
+                    renderPlaylist();
+                    
+                    debugLog(`探索雷达静默加载: 关键词 "${randomKeyword}", 添加 ${uniqueNewSongs.length} 首新歌`);
+                    
+                    // 显示一个不显眼的通知
+                    showNotification(`探索雷达已静默添加 ${uniqueNewSongs.length} 首新歌`, "info", 2000);
+                }
+            }
+        } catch (error) {
+            console.warn("静默加载探索雷达歌曲失败:", error);
+            // 静默失败，不显示错误提示
+        }
+    }
+}
+
+
 // 修复：自动播放下一首 - 支持播放模式
 function autoPlayNext() {
     if (dom.audioPlayer && dom.audioPlayer.__solaraMediaSessionHandledEnded === 'skip') {
         dom.audioPlayer.__solaraMediaSessionHandledEnded = false;
         return;
     }
+    
+    // 在播放下一首前检查是否需要静默加载新歌
+    silentlyLoadMoreRadarSongs();
+    
     if (state.playMode === "single") {
         // 单曲循环
         dom.audioPlayer.currentTime = 0;
@@ -3941,30 +4037,55 @@ async function exploreOnlineMusic() {
         btnText.style.display = "none";
         loader.style.display = "inline-block";
 
-        const songs = await API.getRadarPlaylist("3778678", { limit: 50, offset: 0 });
+        // 清空之前的在线音乐
+        state.onlineSongs = [];
+
+        // 随机选择一个关键词
+        const randomKeyword = RANDOM_KEYWORDS[Math.floor(Math.random() * RANDOM_KEYWORDS.length)];
+        
+        // 使用酷我音乐源搜索随机关键词
+        const songs = await API.search(randomKeyword, 'kuwo', 20, 1);
 
         if (songs.length > 0) {
-            // 将在线音乐添加到统一播放列表
-            state.playlistSongs = [...state.playlistSongs, ...songs];
-            state.onlineSongs = songs; // 保留原有的在线音乐列表
+            // 去重逻辑：基于歌曲ID去重
+            const existingSongIds = new Set(state.playlistSongs.map(song => `${song.source}-${song.id}`));
+            const uniqueSongs = songs.filter(song => !existingSongIds.has(`${song.source}-${song.id}`));
 
-            // 更新播放列表显示
-            renderPlaylist();
+            if (uniqueSongs.length > 0) {
+                // 将去重后的歌曲添加到播放列表
+                state.playlistSongs = [...state.playlistSongs, ...uniqueSongs];
+                
+                // 更新在线音乐列表
+                state.onlineSongs = uniqueSongs;
 
-            showNotification(`已加载 ${songs.length} 首探索雷达歌曲到播放列表`);
-            debugLog(`加载探索雷达播放列表成功: ${songs.length} 首歌曲`);
+                // 如果当前没有在播放，自动播放第一首新添加的歌曲
+                if (!state.currentSong && uniqueSongs.length > 0) {
+                    state.currentTrackIndex = state.playlistSongs.length - uniqueSongs.length;
+                    state.currentPlaylist = "playlist";
+                    await playPlaylistSong(state.currentTrackIndex);
+                }
+
+                // 更新播放列表显示
+                renderPlaylist();
+
+                showNotification(`探索雷达已添加 ${uniqueSongs.length} 首随机歌曲 (关键词: ${randomKeyword})`);
+                debugLog(`探索雷达搜索成功: 关键词 "${randomKeyword}", 找到 ${songs.length} 首, 去重后 ${uniqueSongs.length} 首`);
+            } else {
+                showNotification("所有歌曲都已存在于播放列表中", "info");
+            }
         } else {
-            showNotification("未找到在线音乐", "error");
+            showNotification("未找到相关歌曲，请稍后重试", "error");
         }
     } catch (error) {
-        console.error("加载在线音乐失败:", error);
-        showNotification("加载失败，请稍后重试", "error");
+        console.error("探索雷达失败:", error);
+        showNotification("探索失败，请稍后重试", "error");
     } finally {
         btn.disabled = false;
         btnText.style.display = "flex";
         loader.style.display = "none";
     }
 }
+
 
 // 修复：加载歌词
 async function loadLyrics(song) {
@@ -4217,8 +4338,8 @@ function switchMobileView(view) {
     }
 }
 
-// 修复：显示通知
-function showNotification(message, type = "success") {
+// 修改通知函数以支持持续时间参数
+function showNotification(message, type = "success", duration = 3000) {
     const notification = dom.notification;
     notification.textContent = message;
     notification.className = `notification ${type}`;
@@ -4226,5 +4347,6 @@ function showNotification(message, type = "success") {
 
     setTimeout(() => {
         notification.classList.remove("show");
-    }, 3000);
+    }, duration);
 }
+
