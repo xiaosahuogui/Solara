@@ -2131,11 +2131,12 @@ window.addEventListener("load", setupInteractions);
 dom.audioPlayer.addEventListener("ended", autoPlayNext);
 
 function setupInteractions() {
-
     // 添加DOM检查
     if (!checkDOMElements()) {
         console.error('DOM元素加载不完整，功能可能受限');
-        
+        // 继续执行，但功能可能受限
+    }
+
     function ensureQualityMenuPortal() {
         if (!dom.playerQualityMenu || !document.body || !isMobileView) {
             return;
@@ -2219,10 +2220,98 @@ function setupInteractions() {
         dom.playlistItems.addEventListener("click", handleClick);
         dom.playlistItems.addEventListener("keydown", handleKeydown);
     }
-                // 探索雷达按钮
+
+    // 应用主题
+    function applyTheme(isDark) {
+        if (!state.themeDefaultsCaptured) {
+            captureThemeDefaults();
+        }
+        document.body.classList.toggle("dark-mode", isDark);
+        dom.themeToggleButton.classList.toggle("is-dark", isDark);
+        const label = isDark ? "切换为浅色模式" : "切换为深色模式";
+        dom.themeToggleButton.setAttribute("aria-label", label);
+        dom.themeToggleButton.setAttribute("title", label);
+        applyDynamicGradient();
+    }
+
+    // 初始化主题
+    captureThemeDefaults();
+    const savedTheme = safeGetLocalStorage("theme");
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialIsDark = savedTheme ? savedTheme === "dark" : prefersDark;
+    applyTheme(initialIsDark);
+
+    // 初始化音频设置
+    dom.audioPlayer.volume = state.volume;
+    dom.volumeSlider.value = state.volume;
+    updateVolumeSliderBackground(state.volume);
+    updateVolumeIcon(state.volume);
+
+    // 构建菜单
+    buildSourceMenu();
+    updateSourceLabel();
+    buildQualityMenu();
+    ensureQualityMenuPortal();
+    initializePlaylistEventHandlers();
+    updateQualityLabel();
+    updatePlayPauseButton();
+    dom.currentTimeDisplay.textContent = formatTime(state.currentPlaybackTime);
+    updateProgressBarBackground(0, Number(dom.progressBar.max));
+
+    try {
+        // 绑定事件监听器
+        dom.playPauseBtn.addEventListener("click", togglePlayPause);
+        dom.audioPlayer.addEventListener("timeupdate", handleTimeUpdate);
+        dom.audioPlayer.addEventListener("loadedmetadata", handleLoadedMetadata);
+        dom.audioPlayer.addEventListener("play", updatePlayPauseButton);
+        dom.audioPlayer.addEventListener("pause", updatePlayPauseButton);
+        dom.audioPlayer.addEventListener("volumechange", onAudioVolumeChange);
+
+        dom.progressBar.addEventListener("input", handleProgressInput);
+        dom.progressBar.addEventListener("change", handleProgressChange);
+        dom.progressBar.addEventListener("pointerup", handleProgressChange);
+
+        dom.volumeSlider.addEventListener("input", handleVolumeChange);
+
+        if (dom.sourceSelectButton && dom.sourceMenu) {
+            dom.sourceSelectButton.addEventListener("click", toggleSourceMenu);
+            dom.sourceMenu.addEventListener("click", handleSourceSelection);
+        }
+
+        dom.qualityToggle.addEventListener("click", togglePlayerQualityMenu);
+        if (dom.mobileQualityToggle) {
+            dom.mobileQualityToggle.addEventListener("click", togglePlayerQualityMenu);
+        }
+
+        setQualityAnchorState(dom.qualityToggle, false);
+        if (dom.mobileQualityToggle) {
+            setQualityAnchorState(dom.mobileQualityToggle, false);
+        }
+
+        dom.playerQualityMenu.addEventListener("click", handlePlayerQualitySelection);
+
+        if (isMobileView && dom.albumCover) {
+            dom.albumCover.addEventListener("click", () => {
+                toggleMobileInlineLyrics();
+            });
+        }
+
+        if (isMobileView && dom.mobileInlineLyrics) {
+            dom.mobileInlineLyrics.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!state.isMobileInlineLyricsOpen) {
+                    return;
+                }
+                closeMobileInlineLyrics();
+            });
+        }
+
+        // 探索雷达按钮
         if (dom.loadOnlineBtn) {
             dom.loadOnlineBtn.addEventListener("click", exploreOnlineMusic);
         }
+
         if (dom.mobileExploreButton) {
             dom.mobileExploreButton.addEventListener("click", (event) => {
                 event.preventDefault();
@@ -2231,39 +2320,245 @@ function setupInteractions() {
                 exploreOnlineMusic();
             });
         }
-        // 音质切换
-        if (dom.qualityToggle) {
-            dom.qualityToggle.addEventListener("click", togglePlayerQualityMenu);
+
+        if (dom.importPlaylistBtn && dom.importPlaylistInput) {
+            dom.importPlaylistBtn.addEventListener("click", () => {
+                dom.importPlaylistInput.value = "";
+                dom.importPlaylistInput.click();
+            });
+            dom.importPlaylistInput.addEventListener("change", handleImportPlaylistChange);
         }
-        if (dom.mobileQualityToggle) {
-            dom.mobileQualityToggle.addEventListener("click", togglePlayerQualityMenu);
+
+        if (dom.exportPlaylistBtn) {
+            dom.exportPlaylistBtn.addEventListener("click", exportPlaylist);
         }
-        // 播放模式
-        if (dom.playModeBtn) {
-            updatePlayModeUI();
-            dom.playModeBtn.addEventListener("click", togglePlayMode);
+
+        if (dom.mobileImportPlaylistBtn && dom.importPlaylistInput) {
+            dom.mobileImportPlaylistBtn.addEventListener("click", () => {
+                dom.importPlaylistInput.value = "";
+                dom.importPlaylistInput.click();
+            });
         }
+
+        if (dom.mobileExportPlaylistBtn) {
+            dom.mobileExportPlaylistBtn.addEventListener("click", exportPlaylist);
+        }
+
+        if (dom.showPlaylistBtn) {
+            dom.showPlaylistBtn.addEventListener("click", () => {
+                if (isMobileView) {
+                    openMobilePanel("playlist");
+                } else {
+                    switchMobileView("playlist");
+                }
+            });
+        }
+
+        if (dom.showLyricsBtn) {
+            dom.showLyricsBtn.addEventListener("click", () => {
+                if (isMobileView) {
+                    openMobilePanel("lyrics");
+                } else {
+                    switchMobileView("lyrics");
+                }
+            });
+        }
+
+        // 播放模式按钮事件
+        updatePlayModeUI();
+        dom.playModeBtn.addEventListener("click", togglePlayMode);
+
+        // 搜索相关事件
+        dom.searchBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            debugLog("搜索按钮被点击");
+            performSearch();
+        });
+
+        dom.searchInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                debugLog("搜索输入框回车键被按下");
+                performSearch();
+            }
+        });
+
+        updateImportSelectedButton();
+        if (dom.importSelectedBtn) {
+            dom.importSelectedBtn.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                importSelectedSearchResults();
+            });
+        }
+
+        // 修复：点击搜索区域外部时隐藏搜索结果
+        document.addEventListener("click", (e) => {
+            const searchArea = document.querySelector(".search-area");
+            if (searchArea && !searchArea.contains(e.target) && state.isSearchMode) {
+                debugLog("点击搜索区域外部，隐藏搜索结果");
+                hideSearchResults();
+            }
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && state.sourceMenuOpen) {
+                closeSourceMenu();
+            }
+            if (isMobileView && e.key === "Escape") {
+                closeAllMobileOverlays();
+            }
+        });
+
+        // 搜索结果相关事件处理
+        document.addEventListener("click", (e) => {
+            const qualityMenus = document.querySelectorAll(".quality-menu");
+            qualityMenus.forEach(menu => {
+                if (!menu.contains(e.target) &&
+                    !e.target.closest(".playlist-item-download")) {
+                    menu.classList.remove("show");
+                    const parentItem = menu.closest(".search-result-item");
+                    if (parentItem) parentItem.classList.remove("menu-active");
+                }
+            });
+
+            if (state.qualityMenuOpen &&
+                dom.playerQualityMenu &&
+                !dom.playerQualityMenu.contains(e.target)) {
+                const anchor = isElementNode(qualityMenuAnchor) ? qualityMenuAnchor : resolveQualityAnchor();
+                if (anchor && anchor.contains(e.target)) {
+                    return;
+                }
+                closePlayerQualityMenu();
+            }
+
+            if (state.sourceMenuOpen &&
+                dom.sourceMenu &&
+                dom.sourceSelectButton &&
+                !dom.sourceMenu.contains(e.target) &&
+                !dom.sourceSelectButton.contains(e.target)) {
+                closeSourceMenu();
+            }
+        });
+
+        // 修复：使用更强健的事件委托处理加载更多按钮点击
+        dom.searchResults.addEventListener("click", (e) => {
+            debugLog(`点击事件触发: ${e.target.tagName} ${e.target.className} ${e.target.id}`);
+
+            // 检查多种可能的目标元素
+            const loadMoreBtn = e.target.closest(".load-more-btn") || 
+                               e.target.closest("#loadMoreBtn") ||
+                               (e.target.id === "loadMoreBtn" ? e.target : null) ||
+                               (e.target.classList.contains("load-more-btn") ? e.target : null);
+
+            if (loadMoreBtn) {
+                debugLog("检测到加载更多按钮点击");
+                e.preventDefault();
+                e.stopPropagation();
+                loadMoreResults();
+            }
+        });
+
+        // 额外的直接事件监听器作为备用
+        document.addEventListener("click", (e) => {
+            if (e.target.id === "loadMoreBtn" || e.target.closest("#loadMoreBtn")) {
+                debugLog("备用事件监听器触发");
+                e.preventDefault();
+                e.stopPropagation();
+                loadMoreResults();
+            }
+        });
+
+        // 新增：歌词滚动监听
+        const attachLyricScrollHandler = (scrollElement, getCurrentElement) => {
+            if (!scrollElement) {
+                return;
+            }
+            scrollElement.addEventListener("scroll", () => {
+                state.userScrolledLyrics = true;
+                clearTimeout(state.lyricsScrollTimeout);
+                state.lyricsScrollTimeout = setTimeout(() => {
+                    state.userScrolledLyrics = false;
+                    const currentLyricElement = typeof getCurrentElement === "function"
+                        ? getCurrentElement()
+                        : dom.lyricsContent?.querySelector(".current");
+                    if (currentLyricElement) {
+                        scrollToCurrentLyric(currentLyricElement, scrollElement);
+                    }
+                }, 3000);
+            }, { passive: true });
+        };
+
+        attachLyricScrollHandler(dom.lyricsScroll, () => dom.lyricsContent?.querySelector(".current"));
+        attachLyricScrollHandler(dom.mobileInlineLyricsScroll, () => dom.mobileInlineLyricsContent?.querySelector(".current"));
+
         console.log('事件监听器绑定完成');
     } catch (error) {
         console.error('事件监听器绑定失败:', error);
-        // 在 setupInteractions 函数末尾添加
-console.log('Solara播放器初始化完成');
-
-// 测试按钮功能
-setTimeout(() => {
-    console.log('=== 功能测试 ===');
-    console.log('探索雷达按钮:', dom.loadOnlineBtn ? '存在' : '不存在');
-    console.log('播放/暂停按钮:', dom.playPauseBtn ? '存在' : '不存在');
-    console.log('搜索按钮:', dom.searchBtn ? '存在' : '不存在');
-    console.log('音质切换按钮:', dom.qualityToggle ? '存在' : '不存在');
-    
-    // 测试关键函数
-    console.log('探索雷达函数:', typeof exploreOnlineMusic);
-    console.log('播放/暂停函数:', typeof togglePlayPause);
-    console.log('搜索函数:', typeof performSearch);
-}, 1000);
-
     }
+
+    updatePlaylistActionStates();
+
+    // 播放列表恢复逻辑
+    if (state.playlistSongs.length > 0) {
+        let restoredIndex = state.currentTrackIndex;
+        if (restoredIndex < 0 || restoredIndex >= state.playlistSongs.length) {
+            restoredIndex = 0;
+        }
+
+        state.currentTrackIndex = restoredIndex;
+        state.currentPlaylist = "playlist";
+        renderPlaylist();
+
+        const restoredSong = state.playlistSongs[restoredIndex];
+        if (restoredSong) {
+            state.currentSong = restoredSong;
+            updatePlaylistHighlight();
+            updateCurrentSongInfo(restoredSong).catch(error => {
+                console.error("恢复歌曲信息失败:", error);
+            });
+            
+            // 新增：页面加载时自动定位到当前歌曲
+            autoScrollToCurrentSong();
+        }
+
+        savePlayerState();
+    } else {
+        dom.playlist.classList.add("empty");
+        if (dom.playlistItems) {
+            dom.playlistItems.innerHTML = "";
+        }
+        updateMobileClearPlaylistVisibility();
+    }
+
+    if (state.currentSong) {
+        restoreCurrentSongState();
+    }
+
+    if (isMobileView) {
+        initializeMobileUI();
+        updateMobileClearPlaylistVisibility();
+    }
+
+    console.log('Solara播放器初始化完成');
+
+    // 测试按钮功能
+    setTimeout(() => {
+        console.log('=== 功能测试 ===');
+        console.log('探索雷达按钮:', dom.loadOnlineBtn ? '存在' : '不存在');
+        console.log('播放/暂停按钮:', dom.playPauseBtn ? '存在' : '不存在');
+        console.log('搜索按钮:', dom.searchBtn ? '存在' : '不存在');
+        console.log('音质切换按钮:', dom.qualityToggle ? '存在' : '不存在');
+        
+        // 测试关键函数
+        console.log('探索雷达函数:', typeof exploreOnlineMusic);
+        console.log('播放/暂停函数:', typeof togglePlayPause);
+        console.log('搜索函数:', typeof performSearch);
+    }, 1000);
+}
+
 
     function applyTheme(isDark) {
         if (!state.themeDefaultsCaptured) {
